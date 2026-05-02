@@ -2,6 +2,7 @@ services:
   - type: web
     name: ai-attendance-backend
     env: python
+    plan: free
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn --worker-class eventlet -w 1 --bind 0.0.0.0:$PORT app:app
     envVars:
@@ -11,11 +12,3 @@ services:
         value: production
       - key: SECRET_KEY
         generateValue: true
-      - key: DATABASE_PATH
-        value: /data/database.db
-      - key: PROOFS_DIR
-        value: /data/proofs
-    disk:
-      name: ai-attendance-data
-      mountPath: /data
-      sizeGB: 1
