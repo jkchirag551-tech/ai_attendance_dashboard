@@ -84,6 +84,18 @@
       <excludeFolder url="file://$MODULE_DIR$/trying_flutter/windows/flutter/ephemeral/.plugin_symlinks/url_launcher_windows/example/.dart_tool" />
       <excludeFolder url="file://$MODULE_DIR$/trying_flutter/windows/flutter/ephemeral/.plugin_symlinks/url_launcher_windows/example/.pub" />
       <excludeFolder url="file://$MODULE_DIR$/trying_flutter/windows/flutter/ephemeral/.plugin_symlinks/url_launcher_windows/example/build" />
+      <excludeFolder url="file://$MODULE_DIR$/trying_flutter/linux/flutter/ephemeral/.plugin_symlinks/printing/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/trying_flutter/linux/flutter/ephemeral/.plugin_symlinks/printing/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/trying_flutter/linux/flutter/ephemeral/.plugin_symlinks/printing/build" />
+      <excludeFolder url="file://$MODULE_DIR$/trying_flutter/linux/flutter/ephemeral/.plugin_symlinks/printing/example/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/trying_flutter/linux/flutter/ephemeral/.plugin_symlinks/printing/example/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/trying_flutter/linux/flutter/ephemeral/.plugin_symlinks/printing/example/build" />
+      <excludeFolder url="file://$MODULE_DIR$/trying_flutter/windows/flutter/ephemeral/.plugin_symlinks/printing/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/trying_flutter/windows/flutter/ephemeral/.plugin_symlinks/printing/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/trying_flutter/windows/flutter/ephemeral/.plugin_symlinks/printing/build" />
+      <excludeFolder url="file://$MODULE_DIR$/trying_flutter/windows/flutter/ephemeral/.plugin_symlinks/printing/example/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/trying_flutter/windows/flutter/ephemeral/.plugin_symlinks/printing/example/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/trying_flutter/windows/flutter/ephemeral/.plugin_symlinks/printing/example/build" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.12 (ai_attendance_dashboard)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
