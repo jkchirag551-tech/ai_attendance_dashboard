@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academic Calendar | MR. Attendance</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #FDFDFD;
+            --surface-color: #FFFFFF;
+            --on-surface: #000000;
+            --card-border: rgba(0, 0, 0, 0.08);
+            --card-shadow: rgba(0, 0, 0, 0.04);
+            --text-muted: rgba(0, 0, 0, 0.4);
+            --logo-bg: #000000;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #000000;
+            --surface-color: #0F172A;
+            --on-surface: #FFFFFF;
+            --card-border: rgba(255, 255, 255, 0.08);
+            --card-shadow: rgba(0, 0, 0, 0.4);
+            --text-muted: rgba(255, 255, 255, 0.4);
+            --logo-bg: #000000;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--on-surface);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            transition: all 0.3s ease;
+            min-height: 100vh;
+            padding-top: 100px;
+        }
+
+        .top-bar {
+            background: var(--surface-color) !important;
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--card-border);
+            padding: 12px 40px;
+        }
+
+        .navbar-brand {
+            display: flex; align-items: center; gap: 15px;
+            font-weight: 900; color: var(--on-surface) !important;
+            letter-spacing: -1px; font-size: 1.4rem;
+        }
+
+        .brand-logo-container {
+            width: 48px; height: 48px;
+            background: #000000; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .glass-panel {
+            background: var(--surface-color);
+            border: 1px solid var(--card-border);
+            border-radius: 28px;
+            box-shadow: 0 10px 40px var(--card-shadow);
+            padding: 30px;
+            margin-bottom: 24px;
+        }
+
+        #calendar {
+            background: transparent;
+            padding: 20px;
+        }
+
+        .fc-header-toolbar { margin-bottom: 30px !important; }
+        .fc-button-primary {
+            background: var(--on-surface) !important;
+            border: none !important;
+            border-radius: 12px !important;
+            font-weight: 700 !important;
+            text-transform: uppercase !important;
+            font-size: 11px !important;
+            letter-spacing: 1px !important;
+            padding: 10px 20px !important;
+        }
+
+        .fc-day-today { background: rgba(0,0,0,0.05) !important; }
+        [data-theme="dark"] .fc-day-today { background: rgba(255,255,255,0.05) !important; }
+
+        .fc-daygrid-day-number { font-weight: 800; opacity: 0.85; color: var(--on-surface) !important; }
+        .fc-col-header-cell-cushion { text-decoration: none; color: var(--on-surface) !important; font-weight: 800; font-size: 11px; text-transform: uppercase; opacity: 0.9; }
+        .fc { color: var(--on-surface); }
+        .fc .fc-toolbar-title,
+        .fc .fc-button-primary,
+        .fc .fc-col-header-cell,
+        .fc .fc-daygrid-day-number,
+        .fc .fc-daygrid-event-title,
+        .fc .fc-button,
+        .fc .fc-button-primary:hover,
+        .fc .fc-button-primary:focus {
+            color: var(--on-surface) !important;
+        }
+        .fc .fc-button-primary {
+            background: rgba(255,255,255,0.12) !important;
+            border: 1px solid rgba(255,255,255,0.12) !important;
+            color: var(--on-surface) !important;
+        }
+        .fc .fc-button-primary:hover,
+        .fc .fc-button-primary:focus {
+            background: rgba(255,255,255,0.18) !important;
+        }
+        .fc .fc-daygrid-day-frame { background: transparent !important; }
+        .fc-theme-standard td, .fc-theme-standard th { background: transparent !important; }
+        [data-theme="dark"] .fc .fc-daygrid-day-bg { background: rgba(255,255,255,0.05) !important; }
+        [data-theme="dark"] .fc .fc-daygrid-event, .fc .fc-daygrid-event-dot, .fc .fc-event { color: #fff !important; }
+
+        .modal-content {
+            background: var(--surface-color);
+            border-radius: 24px;
+            border: 1px solid var(--card-border);
+        }
+
+        .input-pro {
+            background: rgba(0,0,0,0.03); border: 1px solid var(--card-border);
+            border-radius: 16px; padding: 15px 20px; color: var(--on-surface);
+            font-weight: 600; width: 100%; transition: all 0.2s ease;
+        }
+        [data-theme="dark"] .input-pro { background: rgba(255,255,255,0.05); }
+
+        .fc-event { border-radius: 6px !important; border: none !important; padding: 2px 6px !important; font-weight: 700 !important; font-size: 11px !important; }
+        .event-holiday { background-color: #ef4444 !important; color: white !important; }
+        .event-working { background-color: #10b981 !important; color: white !important; }
+    </style>
+</head>
+<body data-theme="light">
+    <nav class="navbar navbar-expand-lg top-bar fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                <div class="brand-logo-container">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" style="width:100%; height:100%; object-fit:contain; filter: contrast(1.1);">
+                </div>
+                <span>MR. Attendance</span>
+            </a>
+        </div>
+    </nav>
+
+    <div class="container px-lg-5">
+        <div class="row mb-4 align-items-center">
+            <div class="col-md-6">
+                <h1 class="display-5 fw-bold" style="letter-spacing: -2px;">Academic Calendar</h1>
+                <p class="text-muted fw-bold small">SCHEDULES & HOLIDAYS OVERVIEW</p>
+            </div>
+            {% if is_admin %}
+            <div class="col-md-6 text-end">
+                <span class="badge bg-danger rounded-pill px-3 py-2 fw-bold"><i class="fas fa-lock me-1"></i> ADMIN EDIT MODE</span>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="glass-panel">
+            <div id="calendar"></div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div class="modal fade" id="eventModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content p-3">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title fw-bold" id="modalDate">Edit Date</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="eventForm">
+                    <div class="modal-body">
+                        <input type="hidden" name="date" id="inputDate">
+                        <div class="mb-3">
+                            <label class="small fw-bold opacity-50 mb-2">Title / Reason</label>
+                            <input type="text" name="title" id="inputTitle" class="input-pro" placeholder="e.g. Winter Break" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="small fw-bold opacity-50 mb-2">Type</label>
+                            <select name="type" id="inputType" class="input-pro">
+                                <option value="holiday">Holiday</option>
+                                <option value="working">Special Working Day</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="button" class="btn btn-danger rounded-pill px-4 fw-bold" id="deleteBtn" style="display:none;">Remove</button>
+                        <button type="submit" class="btn btn-dark rounded-pill px-4 fw-bold">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+    <script>
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.body.setAttribute('data-theme', savedTheme);
+
+        const events = {{ events_json | safe }};
+        const isAdmin = {{ 'true' if is_admin else 'false' }};
+        const calendarEl = document.getElementById('calendar');
+        const modal = new bootstrap.Modal(document.getElementById('eventModal'));
+        const form = document.getElementById('eventForm');
+
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: ''
+            },
+            events: events.map(e => ({
+                title: e.title,
+                start: e.date,
+                className: 'event-' + e.type,
+                extendedProps: { type: e.type }
+            })),
+            dateClick: function(info) {
+                if (!isAdmin) return;
+                document.getElementById('inputDate').value = info.dateStr;
+                document.getElementById('modalDate').innerText = 'Edit Day: ' + info.dateStr;
+
+                const existing = events.find(e => e.date === info.dateStr);
+                document.getElementById('inputTitle').value = existing ? existing.title : '';
+                document.getElementById('inputType').value = existing ? existing.type : 'holiday';
+                document.getElementById('deleteBtn').style.display = existing ? 'block' : 'none';
+
+                modal.show();
+            },
+            eventClick: function(info) {
+                if (!isAdmin) return;
+                const dateStr = info.event.startStr;
+                document.getElementById('inputDate').value = dateStr;
+                document.getElementById('modalDate').innerText = 'Edit Day: ' + dateStr;
+                document.getElementById('inputTitle').value = info.event.title;
+                document.getElementById('inputType').value = info.event.extendedProps.type;
+                document.getElementById('deleteBtn').style.display = 'block';
+                modal.show();
+            }
+        });
+        calendar.render();
+
+        if (isAdmin) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+                formData.append('action', 'save');
+                fetch("{{ url_for('admin.academic_calendar') }}", {
+                    method: 'POST',
+                    body: formData
+                }).then(() => location.reload());
+            });
+
+            document.getElementById('deleteBtn').addEventListener('click', function() {
+                const formData = new FormData();
+                formData.append('date', document.getElementById('inputDate').value);
+                formData.append('action', 'delete');
+                fetch("{{ url_for('admin.academic_calendar') }}", {
+                    method: 'POST',
+                    body: formData
+                }).then(() => location.reload());
+            });
+        }
+    </script>
+</body>
+</html>

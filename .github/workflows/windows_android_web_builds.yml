@@ -1,0 +1,77 @@
+name: Windows, Android, and Web Builds
+
+on:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  # Job 1: Build Windows (.exe) using a Windows server
+  build-windows:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: ./trying_flutter
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🐦 Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: 📦 Install Dependencies
+        run: flutter pub get
+
+      - name: 🪟 Build Windows (.exe)
+        run: flutter build windows --release
+
+      - name: 📤 Upload Windows File
+        uses: actions/upload-artifact@v4
+        with:
+          name: Windows-Build
+          path: trying_flutter/build/windows/x64/runner/Release/
+
+  # Job 2: Build Android (APK) and Web using an Ubuntu server (faster)
+  build-android-web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./trying_flutter
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: ☕ Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: 🐦 Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: 📦 Install Dependencies
+        run: flutter pub get
+
+      - name: 🤖 Build Android (APK)
+        run: flutter build apk --release
+
+      - name: 🌐 Build Web
+        run: flutter build web
+
+      - name: 📤 Upload Android File
+        uses: actions/upload-artifact@v4
+        with:
+          name: Android-Build
+          path: trying_flutter/build/app/outputs/flutter-apk/app-release.apk
+
+      - name: 📤 Upload Web File
+        uses: actions/upload-artifact@v4
+        with:
+          name: Web-Build
+          path: trying_flutter/build/web/

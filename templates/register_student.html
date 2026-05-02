@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration | MR. Attendance</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #FDFDFD;
+            --surface-color: #FFFFFF;
+            --on-surface: #000000;
+            --card-border: rgba(0, 0, 0, 0.08);
+            --card-shadow: rgba(0, 0, 0, 0.04);
+            --text-muted: rgba(0, 0, 0, 0.4);
+            --logo-bg: #000000;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #000000;
+            --surface-color: #0F172A;
+            --on-surface: #FFFFFF;
+            --card-border: rgba(255, 255, 255, 0.08);
+            --card-shadow: rgba(0, 0, 0, 0.4);
+            --text-muted: rgba(255, 255, 255, 0.4);
+            --logo-bg: #000000;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--on-surface);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            transition: all 0.3s ease;
+            min-height: 100vh;
+            padding-top: 100px;
+            overflow-x: hidden;
+        }
+
+        .bg-glow {
+            position: fixed; width: 600px; height: 600px; border-radius: 50%;
+            background: radial-gradient(circle, var(--on-surface), transparent);
+            opacity: 0.015; z-index: -1; pointer-events: none;
+        }
+        .glow-1 { top: -100px; right: -50px; }
+        .glow-2 { bottom: -80px; left: -60px; width: 700px; height: 700px; opacity: 0.01; }
+
+        .top-bar {
+            background: var(--surface-color) !important;
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--card-border);
+            padding: 12px 40px;
+        }
+
+        .navbar-brand {
+            display: flex; align-items: center; gap: 15px;
+            font-weight: 900; color: var(--on-surface) !important;
+            letter-spacing: -1px; font-size: 1.4rem;
+        }
+
+        .brand-logo-container {
+            width: 48px; height: 48px;
+            background: #000000 !important; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .nav-link {
+            color: var(--on-surface) !important; opacity: 0.5;
+            font-weight: 700; padding: 10px 20px !important;
+            border-radius: 14px; transition: all 0.3s ease;
+        }
+        .nav-link:hover, .nav-link.active {
+            opacity: 1; background: var(--on-surface); color: var(--bg-color) !important;
+        }
+
+        .glass-panel {
+            background: var(--surface-color);
+            border: 1px solid var(--card-border);
+            border-radius: 28px;
+            box-shadow: 0 10px 40px var(--card-shadow);
+            padding: 40px;
+            margin-bottom: 24px;
+        }
+
+        .input-pro {
+            background: #FFFFFF;
+            border: 1px solid rgba(0, 0, 0, 0.12);
+            border-radius: 16px; padding: 16px 20px; color: #000000;
+            font-weight: 600; width: 100%; transition: all 0.2s ease;
+        }
+        [data-theme="dark"] .input-pro {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.15);
+            color: #FFFFFF;
+        }
+        .input-pro option {
+            background-color: var(--surface-color);
+            color: var(--on-surface);
+        }
+        .input-pro:focus { outline: none; border-color: var(--on-surface); }
+
+        .video-box {
+            border-radius: 24px; overflow: hidden; background: #000;
+            aspect-ratio: 4/3; width: 100%; position: relative;
+        }
+        #videoFeed { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+
+        .btn-custom {
+            background: var(--on-surface); color: var(--bg-color);
+            border-radius: 18px; padding: 16px 32px;
+            font-weight: 800; border: none; transition: all 0.3s ease;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+
+        .btn-outline-pro {
+            border: 1px solid var(--on-surface);
+            color: var(--on-surface);
+            background: transparent;
+            transition: all 0.3s ease;
+        }
+        .btn-outline-pro:hover {
+            background: var(--on-surface);
+            color: var(--bg-color);
+        }
+
+        .theme-toggle {
+            cursor: pointer; width: 48px; height: 48px;
+            border-radius: 14px; background: var(--on-surface);
+            color: var(--bg-color); display: flex;
+            align-items: center; justify-content: center;
+            margin-left: 15px;
+        }
+
+        .section-label {
+            font-size: 11px; font-weight: 800;
+            text-transform: uppercase; letter-spacing: 1.5px;
+            color: var(--text-muted); margin-bottom: 25px;
+            display: block;
+        }
+    </style>
+</head>
+<body data-theme="light">
+    <div class="bg-glow glow-1"></div>
+    <div class="bg-glow glow-2"></div>
+
+    <nav class="navbar navbar-expand-lg top-bar fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                <div class="brand-logo-container">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" style="width:100%; height:100%; object-fit:contain; filter: contrast(1.1);">
+                </div>
+                <span>MR. Attendance</span>
+            </a>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.welcome') }}">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% if portal_role == 'teacher' %}{{ url_for('teacher.dashboard') }}{% else %}{{ url_for('admin.admin_dashboard') }}{% endif %}">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.academic_calendar') }}">Calendar</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="#">Register</a></li>
+                    <li class="nav-item"><div class="theme-toggle" onclick="toggleTheme()"><i class="fas fa-moon" id="theme-icon"></i></div></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container px-lg-5">
+        <div class="row mb-5 text-center">
+            <div class="col-12">
+                <h1 class="display-4" style="font-weight: 900; letter-spacing: -2px;">Enrollment</h1>
+                <span class="section-label">Create Secure User Identities</span>
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-11">
+                <div class="glass-panel">
+                    <form method="post" id="registerForm">
+                        <div class="row g-5">
+                            <div class="col-lg-6">
+                                <span class="section-label">Identity Profile</span>
+                                <div class="mb-4" {% if portal_role == 'teacher' %}style="display:none;"{% endif %}>
+                                    <label class="fw-bold small mb-2 opacity-50">Account Role</label>
+                                    <select name="role" id="role" class="input-pro">
+                                        <option value="student" selected>Student</option>
+                                        <option value="teacher">Teacher</option>
+                                        <option value="admin">Administrator</option>
+                                    </select>
+                                </div>
+                                {% if portal_role == 'teacher' %}
+                                <input type="hidden" name="role" value="student">
+                                {% endif %}
+                                <div class="mb-4">
+                                    <label class="fw-bold small mb-2 opacity-50">Full Name</label>
+                                    <input type="text" name="fullname" class="input-pro" placeholder="John Doe" required>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="fw-bold small mb-2 opacity-50">Registration Number</label>
+                                    <input type="text" name="userid" class="input-pro" placeholder="STU-2025-001" required>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="fw-bold small mb-2 opacity-50">Portal Username</label>
+                                    <input type="text" name="username" class="input-pro" placeholder="john.doe" required>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="fw-bold small mb-2 opacity-50">Security Password</label>
+                                    <input type="password" name="password" class="input-pro" placeholder="••••••••" required>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="fw-bold small mb-2 opacity-50">Email Address</label>
+                                    <input type="email" name="email" class="input-pro" placeholder="email@example.com" required>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="fw-bold small mb-2 opacity-50">Phone Number</label>
+                                    <input type="tel" name="phone" class="input-pro" placeholder="+91 XXXXX XXXXX" required>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6" id="studentCaptureSection">
+                                <span class="section-label">Biometric Enrollment</span>
+                                <div class="video-box mb-4 shadow-lg">
+                                    <video id="videoFeed" autoplay playsinline></video>
+                                </div>
+                                <button type="button" id="captureBtn" class="btn btn-outline-pro w-100 rounded-pill py-3 fw-bold mb-4">Capture Face Identity</button>
+                                <div id="previewBox" style="display:none;" class="text-center">
+                                    <img id="previewImage" src="" class="rounded-4 shadow-sm mb-3" style="width:120px; height:120px; object-fit:cover; border:2px solid var(--on-surface);">
+                                    <p class="small fw-bold text-success"><i class="fas fa-check-circle me-1"></i> Biometric Data Ready</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <input type="hidden" name="image" id="imageData">
+                        <div class="mt-5 pt-4 border-top text-end">
+                            <button type="submit" class="btn btn-custom px-5">Complete Registration</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <canvas id="captureCanvas" style="display:none;"></canvas>
+
+    <script>
+        function toggleTheme() {
+            const body = document.body;
+            const next = body.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+            body.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            document.getElementById('theme-icon').className = next === 'light' ? 'fas fa-moon' : 'fas fa-sun';
+        }
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.body.setAttribute('data-theme', savedTheme);
+        document.getElementById('theme-icon').className = savedTheme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
+
+        const video = document.getElementById('videoFeed');
+        const canvas = document.getElementById('captureCanvas');
+        const captureBtn = document.getElementById('captureBtn');
+        const role = document.getElementById('role');
+        const captureSection = document.getElementById('studentCaptureSection');
+
+        navigator.mediaDevices.getUserMedia({ video: true }).then(stream => video.srcObject = stream);
+
+        role.addEventListener('change', () => {
+            captureSection.style.display = role.value === 'student' ? '' : 'none';
+        });
+
+        captureBtn.addEventListener('click', () => {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            const data = canvas.toDataURL('image/jpeg');
+            document.getElementById('imageData').value = data;
+            document.getElementById('previewImage').src = data;
+            document.getElementById('previewBox').style.display = 'block';
+        });
+    </script>
+</body>
+</html>

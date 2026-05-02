@@ -1,0 +1,40 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+debug.log
+instance/
+.idea/
+*.db
+*.sqlite3
+
+# Face Recognition Temps
+static/proofs/*.jpg
+latest_capture.jpg
+reference_face.jpg
+
+# Firebase / Secrets (IMPORTANT: Keep these out of public repos)
+firebase-adminsdk.json
+trying_flutter/android/app/google-services.json
+
+# Flutter
+trying_flutter/.dart_tool/
+trying_flutter/.flutter-plugins
+trying_flutter/.flutter-plugins-dependencies
+trying_flutter/.pub-cache/
+trying_flutter/.pub/
+trying_flutter/build/
+trying_flutter/.metadata
+trying_flutter/android/local.properties
+trying_flutter/ios/Flutter/Generated.xcconfig
+trying_flutter/ios/Flutter/flutter_export_environment.sh
+trying_flutter/windows/flutter/ephemeral/
+trying_flutter/linux/flutter/ephemeral/
+trying_flutter/macos/Flutter/ephemeral/
+
+# Misc
+.DS_Store
+*.log

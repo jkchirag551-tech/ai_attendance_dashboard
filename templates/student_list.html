@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Directories | MR. Attendance</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #FDFDFD;
+            --surface-color: #FFFFFF;
+            --on-surface: #000000;
+            --accent: #000000;
+            --card-border: rgba(0, 0, 0, 0.08);
+            --card-shadow: rgba(0, 0, 0, 0.04);
+            --text-muted: rgba(0, 0, 0, 0.4);
+            --logo-bg: #000000;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #000000;
+            --surface-color: #0F172A;
+            --on-surface: #FFFFFF;
+            --accent: #FFFFFF;
+            --card-border: rgba(255, 255, 255, 0.08);
+            --card-shadow: rgba(0, 0, 0, 0.4);
+            --text-muted: rgba(255, 255, 255, 0.4);
+            --logo-bg: #000000;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--on-surface);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            transition: all 0.3s ease;
+            min-height: 100vh;
+            padding-top: 100px;
+            overflow-x: hidden;
+        }
+
+        .bg-glow {
+            position: fixed; width: 600px; height: 600px; border-radius: 50%;
+            background: radial-gradient(circle, var(--on-surface), transparent);
+            opacity: 0.015; z-index: -1; pointer-events: none;
+        }
+        .glow-1 { top: -100px; right: -50px; }
+        .glow-2 { bottom: -80px; left: -60px; width: 700px; height: 700px; opacity: 0.01; }
+
+        .top-bar {
+            background: var(--surface-color) !important;
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--card-border);
+            padding: 12px 40px;
+        }
+
+        .navbar-brand {
+            display: flex; align-items: center; gap: 15px;
+            font-weight: 900; color: var(--on-surface) !important;
+            letter-spacing: -1px; font-size: 1.4rem;
+        }
+
+        .brand-logo-container {
+            width: 48px; height: 48px;
+            background: #000000; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
+        }
+
+        .nav-link {
+            color: var(--on-surface) !important; opacity: 0.5;
+            font-weight: 700; padding: 10px 20px !important;
+            border-radius: 14px; transition: all 0.3s ease;
+        }
+        .nav-link:hover, .nav-link.active {
+            opacity: 1; background: var(--on-surface); color: var(--bg-color) !important;
+        }
+
+        .glass-panel {
+            background: var(--surface-color);
+            border: 1px solid var(--card-border);
+            border-radius: 28px;
+            box-shadow: 0 10px 40px var(--card-shadow);
+            padding: 30px;
+            margin-bottom: 40px;
+        }
+
+        .table thead th {
+            background: transparent; color: var(--text-muted);
+            font-size: 11px; font-weight: 800;
+            text-transform: uppercase; letter-spacing: 1.2px;
+            border-bottom: 1px solid var(--card-border);
+            padding: 18px 15px;
+        }
+
+        .table tbody td {
+            padding: 22px 15px; vertical-align: middle;
+            font-weight: 700; color: var(--on-surface);
+            border: none;
+        }
+
+        .status-chip {
+            padding: 6px 14px; border-radius: 10px;
+            font-size: 10px; font-weight: 900;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .status-enrolled { background: #bbf7d0; color: #166534; }
+        .status-missing { background: #fee2e2; color: #991b1b; }
+
+        .btn-custom {
+            background: var(--on-surface);
+            color: var(--bg-color);
+            border-radius: 18px;
+            padding: 12px 24px;
+            font-weight: 800; border: none;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+        }
+        .btn-warning { background: #facc15; color: #000; }
+        .btn-danger { background: #ef4444; color: #fff; }
+
+        .theme-toggle {
+            cursor: pointer; width: 48px; height: 48px;
+            border-radius: 14px; background: var(--on-surface);
+            color: var(--bg-color); display: flex;
+            align-items: center; justify-content: center;
+            margin-left: 15px;
+        }
+
+        .search-box {
+            background: rgba(0,0,0,0.03);
+            border-radius: 20px;
+            border: 1px solid var(--card-border);
+            padding: 15px 25px;
+            color: var(--on-surface);
+            font-weight: 600;
+        }
+
+        .directory-row.is-hidden { display: none; }
+        .section-label {
+            font-size: 11px; font-weight: 800; text-transform: uppercase;
+            letter-spacing: 1.5px; opacity: 0.4; margin-bottom: 25px;
+            display: block;
+        }
+    </style>
+</head>
+<body data-theme="light">
+    <div class="bg-glow glow-1"></div>
+    <div class="bg-glow glow-2"></div>
+
+    <nav class="navbar navbar-expand-lg top-bar fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('admin.admin_dashboard') }}">
+                <div class="brand-logo-container">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" style="width:100%; height:100%; object-fit:contain; filter: contrast(1.1);">
+                </div>
+                <span>Mr. Attendance</span>
+            </a>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.welcome') }}">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.admin_dashboard') }}">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="{{ url_for('admin.student_list') }}">Users</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.logs') }}">Logs</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.academic_calendar') }}">Calendar</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.settings') }}">Settings</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout_page') }}">Sign Out</a></li>
+                    <li class="nav-item"><div class="theme-toggle" onclick="toggleTheme()"><i class="fas fa-moon" id="theme-icon"></i></div></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container px-lg-5">
+        <div class="row align-items-end mb-5">
+            <div class="col-lg-6">
+                <h1 class="display-4" style="font-weight: 900; letter-spacing: -2px;">Directories</h1>
+                <span class="section-label">Management Command Center</span>
+            </div>
+            <div class="col-lg-6">
+                <form method="get" class="d-flex gap-3 justify-content-lg-end">
+                    <input type="text" name="search" value="{{ search_name or '' }}" placeholder="Global Search Identity..." class="form-control search-box border-0">
+                    <button type="submit" class="btn btn-custom px-4">Execute</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Students -->
+        <div class="glass-panel p-0 overflow-hidden">
+            <div class="p-4 border-bottom d-flex justify-content-between align-items-center">
+                <h3 class="mb-0 fw-black" style="font-weight: 800;">Student Portfolio</h3>
+                <a href="{{ url_for('admin.register_student') }}" class="btn btn-sm btn-outline-dark rounded-pill px-3 fw-bold">Add Student</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Student Identity</th>
+                            <th>ID / User</th>
+                            <th>Status</th>
+                            <th>Governance</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in students %}
+                        <tr class="directory-row student-row{% if loop.index > 10 %} is-hidden{% endif %}">
+                            <td><div class="fw-bold">{{ student.fullname }}</div></td>
+                            <td>{{ student.userid }} <span class="opacity-50 ms-2">@{{ student.username }}</span></td>
+                            <td>
+                                <span class="status-chip {% if student.face_encoding %}status-enrolled{% else %}status-missing{% endif %}">
+                                    {{ 'Biometric Active' if student.face_encoding else 'Pending' }}
+                                </span>
+                            </td>
+                            <td><span class="badge rounded-pill bg-dark">{{ student.attendance_percentage }}%</span></td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-custom btn-sm" onclick="openExportModal({{ student.id }}, '{{ student.fullname|escape }}', 'admin')"><i class="fas fa-download"></i></button>
+                                    <button class="btn btn-warning btn-sm" onclick="openResetPasswordModal({{ student.id }}, '{{ student.fullname|escape }}')"><i class="fas fa-key"></i></button>
+                                    <button class="btn btn-danger btn-sm" onclick="deleteStudent({{ student.id }}, '{{ student.fullname }}')"><i class="fas fa-trash"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% if students|length > 10 %}
+            <div class="p-4 text-center border-top">
+                <button class="btn btn-sm btn-outline-dark rounded-pill px-4 fw-bold" id="toggleStudents">View Complete Portfolio</button>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Teachers -->
+        <div class="glass-panel p-0 overflow-hidden">
+            <div class="p-4 border-bottom d-flex justify-content-between align-items-center">
+                <h3 class="mb-0 fw-black" style="font-weight: 800;">Faculty Directory</h3>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Faculty Name</th>
+                            <th>User Identifier</th>
+                            <th>Role</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for teacher in teachers %}
+                        <tr class="directory-row teacher-row{% if loop.index > 10 %} is-hidden{% endif %}">
+                            <td><div class="fw-bold">{{ teacher.fullname }}</div></td>
+                            <td>{{ teacher.userid }} <span class="opacity-50 ms-2">@{{ teacher.username }}</span></td>
+                            <td><span class="status-chip status-enrolled">Faculty</span></td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-warning btn-sm" onclick="openResetPasswordModal({{ teacher.id }}, '{{ teacher.fullname|escape }}')"><i class="fas fa-key"></i></button>
+                                    <button class="btn btn-danger btn-sm" onclick="deleteStudent({{ teacher.id }}, '{{ teacher.fullname }}')"><i class="fas fa-trash"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% if teachers|length > 10 %}
+            <div class="p-4 text-center border-top">
+                <button class="btn btn-sm btn-outline-dark rounded-pill px-4 fw-bold" id="toggleTeachers">View All Faculty</button>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Admins -->
+        <div class="glass-panel p-0 overflow-hidden">
+            <div class="p-4 border-bottom d-flex justify-content-between align-items-center">
+                <h3 class="mb-0 fw-black" style="font-weight: 800;">Administrative Control</h3>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Administrator</th>
+                            <th>Identifier</th>
+                            <th>Access Level</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for admin in admins %}
+                        <tr class="directory-row admin-row{% if loop.index > 10 %} is-hidden{% endif %}">
+                            <td><div class="fw-bold">{{ admin.fullname }}</div></td>
+                            <td>@{{ admin.username }}</td>
+                            <td><span class="status-chip status-missing">System Admin</span></td>
+                            <td>
+                                <button class="btn btn-warning btn-sm" onclick="openResetPasswordModal({{ admin.id }}, '{{ admin.fullname|escape }}')"><i class="fas fa-key"></i> Credentials</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal fade" id="exportModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content glass-panel border-0 text-center" style="margin-bottom:0;">
+                <h4 class="fw-black mb-4">Export Records</h4>
+                <p id="exportStudentName" class="mb-4 fw-bold"></p>
+                <div class="d-grid gap-3">
+                    <a id="exportExcelBtn" href="#" class="btn btn-enter rounded-4 p-3 fw-bold bg-dark text-white">Excel Sheet</a>
+                    <a id="exportPdfBtn" href="#" class="btn btn-enter rounded-4 p-3 fw-bold bg-danger text-white">PDF Document</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="passwordModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content glass-panel border-0" style="margin-bottom:0;">
+                <h4 class="fw-black mb-4">Credential Override</h4>
+                <p class="mb-3 opacity-50 fw-bold">Set new access key for <span id="passwordUserName"></span></p>
+                <input type="password" id="newPassword" class="form-control search-box border-0 mb-4" placeholder="••••••••">
+                <button id="confirmPasswordReset" class="btn btn-custom w-100 p-3">Update Security Key</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function toggleTheme() {
+            const body = document.body;
+            const next = body.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+            body.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            document.getElementById('theme-icon').className = next === 'light' ? 'fas fa-moon' : 'fas fa-sun';
+        }
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.body.setAttribute('data-theme', savedTheme);
+        document.getElementById('theme-icon').className = savedTheme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
+
+        function bindToggle(btnId, rowSelector) {
+            const btn = document.getElementById(btnId);
+            if (!btn) return;
+            btn.addEventListener('click', () => {
+                const hidden = document.querySelectorAll(rowSelector);
+                const isHiding = btn.innerText.includes('View');
+                hidden.forEach(r => r.classList.toggle('is-hidden', !isHiding));
+                btn.innerText = isHiding ? 'Show Less' : (btnId === 'toggleStudents' ? 'View Complete Portfolio' : 'View All Faculty');
+            });
+        }
+        bindToggle('toggleStudents', '.student-row.is-hidden');
+        bindToggle('toggleTeachers', '.teacher-row.is-hidden');
+
+        function openExportModal(id, name) {
+            document.getElementById('exportStudentName').textContent = name;
+            document.getElementById('exportExcelBtn').href = `{{ url_for('admin.export_attendance', filetype='excel', student_id=0) }}`.replace('0', id);
+            document.getElementById('exportPdfBtn').href = `{{ url_for('admin.export_attendance', filetype='pdf', student_id=0) }}`.replace('0', id);
+            new bootstrap.Modal(document.getElementById('exportModal')).show();
+        }
+
+        let userToReset = null;
+        function openResetPasswordModal(id, name) {
+            userToReset = id;
+            document.getElementById('passwordUserName').textContent = name;
+            new bootstrap.Modal(document.getElementById('passwordModal')).show();
+        }
+
+        document.getElementById('confirmPasswordReset').addEventListener('click', () => {
+            const pass = document.getElementById('newPassword').value;
+            if (pass.length < 4) return alert('Minimum 4 characters');
+            fetch(`{{ url_for('admin.reset_password', user_id=0) }}`.replace('0', userToReset), {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password: pass })
+            }).then(r => r.json()).then(data => {
+                alert(data.message);
+                if (data.status === 'success') bootstrap.Modal.getInstance(document.getElementById('passwordModal')).hide();
+            });
+        });
+
+        function deleteStudent(id, name) {
+            if (!confirm(`Permanently delete ${name}?`)) return;
+            fetch(`{{ url_for('admin.delete_student', student_id=0) }}`.replace('0', id), { method: 'POST' })
+            .then(r => r.json()).then(data => {
+                alert(data.message);
+                if (data.status === 'success') window.location.reload();
+            });
+        }
+    </script>
+</body>
+</html>
