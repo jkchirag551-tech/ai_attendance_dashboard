@@ -80,9 +80,17 @@ def create_app():
 
     # Initialize Firebase Admin
     try:
-        cred = credentials.Certificate("firebase-adminsdk.json")
-        firebase_admin.initialize_app(cred)
-        print("Firebase Admin initialized successfully.")
+        # Check for Render Secret File path first, then local fallback
+        secret_path = "/etc/secrets/firebase_adminsdk"
+        if not os.path.exists(secret_path):
+            secret_path = "firebase-adminsdk.json"
+            
+        if os.path.exists(secret_path):
+            cred = credentials.Certificate(secret_path)
+            firebase_admin.initialize_app(cred)
+            print(f"Firebase Admin initialized successfully using {secret_path}.")
+        else:
+            print("Warning: Firebase Admin credentials not found. Notifications disabled.")
     except Exception as e:
         print(f"Warning: Firebase Admin could not be initialized. {e}")
 
