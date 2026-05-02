@@ -4,6 +4,8 @@ Flask-SocketIO==5.5.1
 Flask-CORS==5.0.0
 # Core AI libraries
 face_recognition_models==0.3.0
+Pillow>=10.0.0
+Click>=8.1.7
 opencv-python-headless==4.10.0.84
 numpy>=1.23.0,<2.0.0
 Werkzeug==3.1.8
