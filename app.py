@@ -97,6 +97,19 @@ def create_app():
     with app_instance.app_context():
         db.create_all()
         ensure_schema(app_instance)
+        
+        # Create default admin if none exists
+        if User.query.filter_by(role='admin').count() == 0:
+            default_admin = User(
+                role='admin',
+                fullname='System Administrator',
+                userid='ADMIN001',
+                username='admin',
+                password=generate_password_hash('Admin@123')
+            )
+            db.session.add(default_admin)
+            db.session.commit()
+            print("Default admin account created: admin / Admin@123")
 
     app_instance.register_blueprint(auth_bp)
     app_instance.register_blueprint(admin_bp)
