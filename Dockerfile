@@ -1,5 +1,5 @@
-# Use a lightweight Python image
-FROM python:3.10-slim
+# Use Python 3.11 for better compatibility with modern libraries
+FROM python:3.11-slim
 
 # Install system dependencies required for dlib and OpenCV
 RUN apt-get update && apt-get install -y \
