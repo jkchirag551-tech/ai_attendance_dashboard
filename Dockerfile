@@ -1,10 +1,8 @@
-# Use a specialized face_recognition image that has dlib pre-installed
+# Use Python 3.10 slim for compatibility with dlib-bin
 FROM python:3.10-slim
 
 # Install system dependencies for OpenCV and other tools
 RUN apt-get update && apt-get install -y \
-    build-essential \
-    cmake \
     libopenblas-dev \
     liblapack-dev \
     libx11-dev \
@@ -14,11 +12,15 @@ RUN apt-get update && apt-get install -y \
 # Set working directory
 WORKDIR /app
 
-# Copy requirements
-COPY requirements.txt .
+# 1. Install dlib-bin (pre-compiled binary, no memory crash)
+RUN pip install --no-cache-dir dlib-bin==19.24.1
 
-# Install dependencies - we let it try to install face-recognition and dlib normally
-# But we give it a very long timeout and use a pre-built wheel from a reliable source
+# 2. Install face-recognition WITHOUT dependencies
+# (This prevents it from trying to build the standard dlib from source)
+RUN pip install --no-cache-dir face-recognition==1.3.0 --no-dependencies
+
+# 3. Copy requirements and install the rest of the stack
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the application
