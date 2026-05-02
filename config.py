@@ -5,5 +5,9 @@ class Config:
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = 'Lax'
     DATABASE_PATH = os.getenv('DATABASE_PATH', os.path.join(os.getcwd(), 'database.db'))
-    SQLALCHEMY_DATABASE_URI = f"sqlite:///{DATABASE_PATH}"
+    # Use DATABASE_URL for Cloud (Supabase/PostgreSQL) or fallback to local SQLite
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', f"sqlite:///{DATABASE_PATH}")
+    # Fix for newer SQLAlchemy + Heroku/Render PostgreSQL URLs
+    if SQLALCHEMY_DATABASE_URI.startswith("postgres://"):
+        SQLALCHEMY_DATABASE_URI = SQLALCHEMY_DATABASE_URI.replace("postgres://", "postgresql://", 1)
     SQLALCHEMY_TRACK_MODIFICATIONS = False
