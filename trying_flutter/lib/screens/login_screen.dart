@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:url_launcher/url_launcher.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/attendance_api_service.dart';
 import '../widgets/shared_widgets.dart';
@@ -183,6 +185,20 @@ class _LoginHeroPanel extends StatelessWidget {
         Text('We design intelligent digital solutions — from powerful websites and mobile apps to advanced software systems that help businesses grow faster in the modern world.', style: TextStyle(color: onSurface.withValues(alpha: 0.6), fontSize: 16, height: 1.6, fontWeight: FontWeight.w500)),
         const SizedBox(height: 28),
         const Wrap(spacing: 14, runSpacing: 14, children: [FeatureChip(icon: Icons.auto_graph_rounded, label: 'Enterprise Analytics'), FeatureChip(icon: Icons.verified_user_rounded, label: 'Neural Verification'), FeatureChip(icon: Icons.calendar_month_rounded, label: 'Governed Workflow')]),
+        if (kIsWeb) ...[
+          const SizedBox(height: 32),
+          OutlinedButton.icon(
+            onPressed: () => launchUrl(Uri.parse('/static/app-release.apk'), mode: LaunchMode.externalApplication),
+            icon: const Icon(Icons.android_rounded, size: 20),
+            label: const Text('DOWNLOAD MOBILE APP (APK)', style: TextStyle(fontWeight: FontWeight.w800, letterSpacing: 1)),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: onSurface,
+              side: BorderSide(color: onSurface.withValues(alpha: 0.2)),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+          ),
+        ],
       ],
     );
   }
