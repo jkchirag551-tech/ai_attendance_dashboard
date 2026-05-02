@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 import firebase_admin
 from firebase_admin import credentials, messaging
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory, render_template
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit
 from sqlalchemy import text
@@ -513,6 +513,21 @@ def create_app():
         db.session.delete(event)
         db.session.commit()
         return {"status": "success"}, 200
+
+    # --- FLUTTER WEB BUNDLE ROUTES ---
+    @app_instance.route('/')
+    def serve_dashboard():
+        """Serves the Flutter Web Dashboard"""
+        return render_template('index.html')
+
+    @app_instance.route('/<path:path>')
+    def serve_flutter_assets(path):
+        """Handles Flutter JS, CSS, and Asset requests"""
+        # First check if the file exists in templates (for index.html siblings)
+        if os.path.exists(os.path.join(app_instance.root_path, 'templates', path)):
+            return send_from_directory('templates', path)
+        # Then check in static
+        return send_from_directory('static', path)
 
     return app_instance
 

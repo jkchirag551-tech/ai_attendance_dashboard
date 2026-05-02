@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../services/attendance_api_service.dart';
 import '../widgets/shared_widgets.dart';
 import '../widgets/video_background.dart';
+import '../services/notification_service.dart';
 import 'welcome_screen.dart';
 
 class LoginScreen extends StatefulWidget {

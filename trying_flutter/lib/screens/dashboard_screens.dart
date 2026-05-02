@@ -99,15 +99,12 @@ class _AdminDashboardState extends State<AdminDashboard> {
   Future<void> _exportPdf() async {
     setState(() => _isExporting = true);
     try {
-      // Small artificial delay to allow the cinematic animation to breathe
       await Future.delayed(const Duration(milliseconds: 1200));
-      
       await ReportService.generateAuditReport(
         allUsers: _allUsers,
         recentLogs: data.recentLogs,
         threshold: _lowAttendanceThreshold,
       );
-      
       await HapticFeedback.heavyImpact();
     } catch (e) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Report generation failed: $e')));
@@ -347,7 +344,6 @@ class _CinematicLoadingOverlayState extends State<_CinematicLoadingOverlay> with
   }
 }
 
-
 class TeacherDashboard extends StatefulWidget {
   final String username;
   const TeacherDashboard({super.key, required this.username});
@@ -376,12 +372,8 @@ class _TeacherDashboardState extends State<TeacherDashboard> {
       if (mounted) {
         setState(() {
           data = response;
-          // Extract graph_data if it exists in response (we need to update the model or handle it here)
-          // For now let's assume we might need a separate call or update the model.
-          // Since I updated the backend to return graph_data, let's use it.
         });
         
-        // Let's use fetchWeeklyStats for graph for now as it's already there
         final stats = await _api.fetchWeeklyStats();
         if (mounted) setState(() => _graphData = stats);
 
@@ -471,75 +463,6 @@ class _TeacherDashboardState extends State<TeacherDashboard> {
     );
   }
 }
-
-class _CinematicLoadingOverlay extends StatefulWidget {
-  const _CinematicLoadingOverlay();
-
-  @override
-  State<_CinematicLoadingOverlay> createState() => _CinematicLoadingOverlayState();
-}
-
-class _CinematicLoadingOverlayState extends State<_CinematicLoadingOverlay> with SingleTickerProviderStateMixin {
-  late AnimationController _pulseController;
-
-  @override
-  void initState() {
-    super.initState();
-    _pulseController = AnimationController(vsync: this, duration: const Duration(seconds: 1))..repeat(reverse: true);
-  }
-
-  @override
-  void dispose() {
-    _pulseController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return BackdropFilter(
-      filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-      child: Container(
-        color: Colors.black.withValues(alpha: 0.4),
-        child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              AnimatedBuilder(
-                animation: _pulseController,
-                builder: (context, child) {
-                  return Transform.scale(
-                    scale: 1.0 + (_pulseController.value * 0.1),
-                    child: Opacity(
-                      opacity: 0.6 + (_pulseController.value * 0.4),
-                      child: child,
-                    ),
-                  );
-                },
-                child: Container(
-                  width: 80,
-                  height: 80,
-                  decoration: const BoxDecoration(color: Colors.black, shape: BoxShape.circle),
-                  child: Image.asset('assets/images/logo.png', width: 50, height: 50, fit: BoxFit.contain),
-                ),
-              ),
-              const SizedBox(height: 24),
-              const Text(
-                'ASSEMBLING AUDIT REPORT',
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, letterSpacing: 2, fontSize: 12),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'SYCHRONIZING INTELLIGENCE ENGINE...',
-                style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 9, fontWeight: FontWeight.w700),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 
 class StudentDashboard extends StatefulWidget {
   const StudentDashboard({super.key, required this.username});
@@ -690,75 +613,6 @@ class _StudentDashboardState extends State<StudentDashboard> {
   }
 }
 
-class _CinematicLoadingOverlay extends StatefulWidget {
-  const _CinematicLoadingOverlay();
-
-  @override
-  State<_CinematicLoadingOverlay> createState() => _CinematicLoadingOverlayState();
-}
-
-class _CinematicLoadingOverlayState extends State<_CinematicLoadingOverlay> with SingleTickerProviderStateMixin {
-  late AnimationController _pulseController;
-
-  @override
-  void initState() {
-    super.initState();
-    _pulseController = AnimationController(vsync: this, duration: const Duration(seconds: 1))..repeat(reverse: true);
-  }
-
-  @override
-  void dispose() {
-    _pulseController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return BackdropFilter(
-      filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-      child: Container(
-        color: Colors.black.withValues(alpha: 0.4),
-        child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              AnimatedBuilder(
-                animation: _pulseController,
-                builder: (context, child) {
-                  return Transform.scale(
-                    scale: 1.0 + (_pulseController.value * 0.1),
-                    child: Opacity(
-                      opacity: 0.6 + (_pulseController.value * 0.4),
-                      child: child,
-                    ),
-                  );
-                },
-                child: Container(
-                  width: 80,
-                  height: 80,
-                  decoration: const BoxDecoration(color: Colors.black, shape: BoxShape.circle),
-                  child: Image.asset('assets/images/logo.png', width: 50, height: 50, fit: BoxFit.contain),
-                ),
-              ),
-              const SizedBox(height: 24),
-              const Text(
-                'ASSEMBLING AUDIT REPORT',
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, letterSpacing: 2, fontSize: 12),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'SYCHRONIZING INTELLIGENCE ENGINE...',
-                style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 9, fontWeight: FontWeight.w700),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-
 class ConsistencyMatrix extends StatelessWidget {
   const ConsistencyMatrix({super.key, required this.datasets});
   final Map<DateTime, int> datasets;
@@ -805,75 +659,6 @@ class ConsistencyMatrix extends StatelessWidget {
     );
   }
 }
-
-class _CinematicLoadingOverlay extends StatefulWidget {
-  const _CinematicLoadingOverlay();
-
-  @override
-  State<_CinematicLoadingOverlay> createState() => _CinematicLoadingOverlayState();
-}
-
-class _CinematicLoadingOverlayState extends State<_CinematicLoadingOverlay> with SingleTickerProviderStateMixin {
-  late AnimationController _pulseController;
-
-  @override
-  void initState() {
-    super.initState();
-    _pulseController = AnimationController(vsync: this, duration: const Duration(seconds: 1))..repeat(reverse: true);
-  }
-
-  @override
-  void dispose() {
-    _pulseController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return BackdropFilter(
-      filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-      child: Container(
-        color: Colors.black.withValues(alpha: 0.4),
-        child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              AnimatedBuilder(
-                animation: _pulseController,
-                builder: (context, child) {
-                  return Transform.scale(
-                    scale: 1.0 + (_pulseController.value * 0.1),
-                    child: Opacity(
-                      opacity: 0.6 + (_pulseController.value * 0.4),
-                      child: child,
-                    ),
-                  );
-                },
-                child: Container(
-                  width: 80,
-                  height: 80,
-                  decoration: const BoxDecoration(color: Colors.black, shape: BoxShape.circle),
-                  child: Image.asset('assets/images/logo.png', width: 50, height: 50, fit: BoxFit.contain),
-                ),
-              ),
-              const SizedBox(height: 24),
-              const Text(
-                'ASSEMBLING AUDIT REPORT',
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, letterSpacing: 2, fontSize: 12),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'SYCHRONIZING INTELLIGENCE ENGINE...',
-                style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 9, fontWeight: FontWeight.w700),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 
 class SignOutScreen extends StatelessWidget {
   const SignOutScreen({super.key});
@@ -946,75 +731,6 @@ class SignOutScreen extends StatelessWidget {
   }
 }
 
-class _CinematicLoadingOverlay extends StatefulWidget {
-  const _CinematicLoadingOverlay();
-
-  @override
-  State<_CinematicLoadingOverlay> createState() => _CinematicLoadingOverlayState();
-}
-
-class _CinematicLoadingOverlayState extends State<_CinematicLoadingOverlay> with SingleTickerProviderStateMixin {
-  late AnimationController _pulseController;
-
-  @override
-  void initState() {
-    super.initState();
-    _pulseController = AnimationController(vsync: this, duration: const Duration(seconds: 1))..repeat(reverse: true);
-  }
-
-  @override
-  void dispose() {
-    _pulseController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return BackdropFilter(
-      filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-      child: Container(
-        color: Colors.black.withValues(alpha: 0.4),
-        child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              AnimatedBuilder(
-                animation: _pulseController,
-                builder: (context, child) {
-                  return Transform.scale(
-                    scale: 1.0 + (_pulseController.value * 0.1),
-                    child: Opacity(
-                      opacity: 0.6 + (_pulseController.value * 0.4),
-                      child: child,
-                    ),
-                  );
-                },
-                child: Container(
-                  width: 80,
-                  height: 80,
-                  decoration: const BoxDecoration(color: Colors.black, shape: BoxShape.circle),
-                  child: Image.asset('assets/images/logo.png', width: 50, height: 50, fit: BoxFit.contain),
-                ),
-              ),
-              const SizedBox(height: 24),
-              const Text(
-                'ASSEMBLING AUDIT REPORT',
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, letterSpacing: 2, fontSize: 12),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'SYCHRONIZING INTELLIGENCE ENGINE...',
-                style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 9, fontWeight: FontWeight.w700),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-
 class _ShimmerDashboard extends StatelessWidget {
   const _ShimmerDashboard();
 
@@ -1039,75 +755,6 @@ class _ShimmerDashboard extends StatelessWidget {
     );
   }
 }
-
-class _CinematicLoadingOverlay extends StatefulWidget {
-  const _CinematicLoadingOverlay();
-
-  @override
-  State<_CinematicLoadingOverlay> createState() => _CinematicLoadingOverlayState();
-}
-
-class _CinematicLoadingOverlayState extends State<_CinematicLoadingOverlay> with SingleTickerProviderStateMixin {
-  late AnimationController _pulseController;
-
-  @override
-  void initState() {
-    super.initState();
-    _pulseController = AnimationController(vsync: this, duration: const Duration(seconds: 1))..repeat(reverse: true);
-  }
-
-  @override
-  void dispose() {
-    _pulseController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return BackdropFilter(
-      filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-      child: Container(
-        color: Colors.black.withValues(alpha: 0.4),
-        child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              AnimatedBuilder(
-                animation: _pulseController,
-                builder: (context, child) {
-                  return Transform.scale(
-                    scale: 1.0 + (_pulseController.value * 0.1),
-                    child: Opacity(
-                      opacity: 0.6 + (_pulseController.value * 0.4),
-                      child: child,
-                    ),
-                  );
-                },
-                child: Container(
-                  width: 80,
-                  height: 80,
-                  decoration: const BoxDecoration(color: Colors.black, shape: BoxShape.circle),
-                  child: Image.asset('assets/images/logo.png', width: 50, height: 50, fit: BoxFit.contain),
-                ),
-              ),
-              const SizedBox(height: 24),
-              const Text(
-                'ASSEMBLING AUDIT REPORT',
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, letterSpacing: 2, fontSize: 12),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'SYCHRONIZING INTELLIGENCE ENGINE...',
-                style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 9, fontWeight: FontWeight.w700),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 
 class DashboardShell extends StatelessWidget {
   const DashboardShell({
@@ -1253,75 +900,6 @@ class DashboardShell extends StatelessWidget {
   }
 }
 
-class _CinematicLoadingOverlay extends StatefulWidget {
-  const _CinematicLoadingOverlay();
-
-  @override
-  State<_CinematicLoadingOverlay> createState() => _CinematicLoadingOverlayState();
-}
-
-class _CinematicLoadingOverlayState extends State<_CinematicLoadingOverlay> with SingleTickerProviderStateMixin {
-  late AnimationController _pulseController;
-
-  @override
-  void initState() {
-    super.initState();
-    _pulseController = AnimationController(vsync: this, duration: const Duration(seconds: 1))..repeat(reverse: true);
-  }
-
-  @override
-  void dispose() {
-    _pulseController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return BackdropFilter(
-      filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-      child: Container(
-        color: Colors.black.withValues(alpha: 0.4),
-        child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              AnimatedBuilder(
-                animation: _pulseController,
-                builder: (context, child) {
-                  return Transform.scale(
-                    scale: 1.0 + (_pulseController.value * 0.1),
-                    child: Opacity(
-                      opacity: 0.6 + (_pulseController.value * 0.4),
-                      child: child,
-                    ),
-                  );
-                },
-                child: Container(
-                  width: 80,
-                  height: 80,
-                  decoration: const BoxDecoration(color: Colors.black, shape: BoxShape.circle),
-                  child: Image.asset('assets/images/logo.png', width: 50, height: 50, fit: BoxFit.contain),
-                ),
-              ),
-              const SizedBox(height: 24),
-              const Text(
-                'ASSEMBLING AUDIT REPORT',
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, letterSpacing: 2, fontSize: 12),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'SYCHRONIZING INTELLIGENCE ENGINE...',
-                style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 9, fontWeight: FontWeight.w700),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-
 class _BottomNavIcon extends StatelessWidget {
   const _BottomNavIcon({
     required this.icon,
@@ -1366,75 +944,6 @@ class _BottomNavIcon extends StatelessWidget {
     );
   }
 }
-
-class _CinematicLoadingOverlay extends StatefulWidget {
-  const _CinematicLoadingOverlay();
-
-  @override
-  State<_CinematicLoadingOverlay> createState() => _CinematicLoadingOverlayState();
-}
-
-class _CinematicLoadingOverlayState extends State<_CinematicLoadingOverlay> with SingleTickerProviderStateMixin {
-  late AnimationController _pulseController;
-
-  @override
-  void initState() {
-    super.initState();
-    _pulseController = AnimationController(vsync: this, duration: const Duration(seconds: 1))..repeat(reverse: true);
-  }
-
-  @override
-  void dispose() {
-    _pulseController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return BackdropFilter(
-      filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-      child: Container(
-        color: Colors.black.withValues(alpha: 0.4),
-        child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              AnimatedBuilder(
-                animation: _pulseController,
-                builder: (context, child) {
-                  return Transform.scale(
-                    scale: 1.0 + (_pulseController.value * 0.1),
-                    child: Opacity(
-                      opacity: 0.6 + (_pulseController.value * 0.4),
-                      child: child,
-                    ),
-                  );
-                },
-                child: Container(
-                  width: 80,
-                  height: 80,
-                  decoration: const BoxDecoration(color: Colors.black, shape: BoxShape.circle),
-                  child: Image.asset('assets/images/logo.png', width: 50, height: 50, fit: BoxFit.contain),
-                ),
-              ),
-              const SizedBox(height: 24),
-              const Text(
-                'ASSEMBLING AUDIT REPORT',
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, letterSpacing: 2, fontSize: 12),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'SYCHRONIZING INTELLIGENCE ENGINE...',
-                style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 9, fontWeight: FontWeight.w700),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 
 class _DashboardHeader extends StatelessWidget {
   const _DashboardHeader({
@@ -1487,75 +996,6 @@ class _DashboardHeader extends StatelessWidget {
     );
   }
 }
-
-class _CinematicLoadingOverlay extends StatefulWidget {
-  const _CinematicLoadingOverlay();
-
-  @override
-  State<_CinematicLoadingOverlay> createState() => _CinematicLoadingOverlayState();
-}
-
-class _CinematicLoadingOverlayState extends State<_CinematicLoadingOverlay> with SingleTickerProviderStateMixin {
-  late AnimationController _pulseController;
-
-  @override
-  void initState() {
-    super.initState();
-    _pulseController = AnimationController(vsync: this, duration: const Duration(seconds: 1))..repeat(reverse: true);
-  }
-
-  @override
-  void dispose() {
-    _pulseController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return BackdropFilter(
-      filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-      child: Container(
-        color: Colors.black.withValues(alpha: 0.4),
-        child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              AnimatedBuilder(
-                animation: _pulseController,
-                builder: (context, child) {
-                  return Transform.scale(
-                    scale: 1.0 + (_pulseController.value * 0.1),
-                    child: Opacity(
-                      opacity: 0.6 + (_pulseController.value * 0.4),
-                      child: child,
-                    ),
-                  );
-                },
-                child: Container(
-                  width: 80,
-                  height: 80,
-                  decoration: const BoxDecoration(color: Colors.black, shape: BoxShape.circle),
-                  child: Image.asset('assets/images/logo.png', width: 50, height: 50, fit: BoxFit.contain),
-                ),
-              ),
-              const SizedBox(height: 24),
-              const Text(
-                'ASSEMBLING AUDIT REPORT',
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, letterSpacing: 2, fontSize: 12),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'SYCHRONIZING INTELLIGENCE ENGINE...',
-                style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 9, fontWeight: FontWeight.w700),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 
 class _Sidebar extends StatelessWidget {
   const _Sidebar({required this.currentRoute, required this.username});
@@ -1725,75 +1165,6 @@ class _Sidebar extends StatelessWidget {
   }
 }
 
-class _CinematicLoadingOverlay extends StatefulWidget {
-  const _CinematicLoadingOverlay();
-
-  @override
-  State<_CinematicLoadingOverlay> createState() => _CinematicLoadingOverlayState();
-}
-
-class _CinematicLoadingOverlayState extends State<_CinematicLoadingOverlay> with SingleTickerProviderStateMixin {
-  late AnimationController _pulseController;
-
-  @override
-  void initState() {
-    super.initState();
-    _pulseController = AnimationController(vsync: this, duration: const Duration(seconds: 1))..repeat(reverse: true);
-  }
-
-  @override
-  void dispose() {
-    _pulseController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return BackdropFilter(
-      filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-      child: Container(
-        color: Colors.black.withValues(alpha: 0.4),
-        child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              AnimatedBuilder(
-                animation: _pulseController,
-                builder: (context, child) {
-                  return Transform.scale(
-                    scale: 1.0 + (_pulseController.value * 0.1),
-                    child: Opacity(
-                      opacity: 0.6 + (_pulseController.value * 0.4),
-                      child: child,
-                    ),
-                  );
-                },
-                child: Container(
-                  width: 80,
-                  height: 80,
-                  decoration: const BoxDecoration(color: Colors.black, shape: BoxShape.circle),
-                  child: Image.asset('assets/images/logo.png', width: 50, height: 50, fit: BoxFit.contain),
-                ),
-              ),
-              const SizedBox(height: 24),
-              const Text(
-                'ASSEMBLING AUDIT REPORT',
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, letterSpacing: 2, fontSize: 12),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'SYCHRONIZING INTELLIGENCE ENGINE...',
-                style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 9, fontWeight: FontWeight.w700),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-
 class LogsTableCard extends StatelessWidget {
   const LogsTableCard({super.key, required this.title, required this.logs, this.hideTitle = false});
 
@@ -1837,75 +1208,6 @@ class LogsTableCard extends StatelessWidget {
   }
 }
 
-class _CinematicLoadingOverlay extends StatefulWidget {
-  const _CinematicLoadingOverlay();
-
-  @override
-  State<_CinematicLoadingOverlay> createState() => _CinematicLoadingOverlayState();
-}
-
-class _CinematicLoadingOverlayState extends State<_CinematicLoadingOverlay> with SingleTickerProviderStateMixin {
-  late AnimationController _pulseController;
-
-  @override
-  void initState() {
-    super.initState();
-    _pulseController = AnimationController(vsync: this, duration: const Duration(seconds: 1))..repeat(reverse: true);
-  }
-
-  @override
-  void dispose() {
-    _pulseController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return BackdropFilter(
-      filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-      child: Container(
-        color: Colors.black.withValues(alpha: 0.4),
-        child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              AnimatedBuilder(
-                animation: _pulseController,
-                builder: (context, child) {
-                  return Transform.scale(
-                    scale: 1.0 + (_pulseController.value * 0.1),
-                    child: Opacity(
-                      opacity: 0.6 + (_pulseController.value * 0.4),
-                      child: child,
-                    ),
-                  );
-                },
-                child: Container(
-                  width: 80,
-                  height: 80,
-                  decoration: const BoxDecoration(color: Colors.black, shape: BoxShape.circle),
-                  child: Image.asset('assets/images/logo.png', width: 50, height: 50, fit: BoxFit.contain),
-                ),
-              ),
-              const SizedBox(height: 24),
-              const Text(
-                'ASSEMBLING AUDIT REPORT',
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, letterSpacing: 2, fontSize: 12),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'SYCHRONIZING INTELLIGENCE ENGINE...',
-                style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 9, fontWeight: FontWeight.w700),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-
 class _LogDataRow extends StatelessWidget {
   const _LogDataRow({required this.log});
 
@@ -1940,24 +1242,6 @@ class _LogDataRow extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  Future<void> _sendTestNotification() async {
-    try {
-      final token = await NotificationService.getToken();
-      if (token == null) {
-        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Notification system not initialized.')));
-        return;
-      }
-      await _api.sendTestNotification(token);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Test signal dispatched to this device! 📡'), behavior: SnackBarBehavior.floating),
-        );
-      }
-    } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Test failed: $e')));
-    }
   }
 
   @override
@@ -2018,75 +1302,6 @@ class _LogDataRow extends StatelessWidget {
   }
 }
 
-class _CinematicLoadingOverlay extends StatefulWidget {
-  const _CinematicLoadingOverlay();
-
-  @override
-  State<_CinematicLoadingOverlay> createState() => _CinematicLoadingOverlayState();
-}
-
-class _CinematicLoadingOverlayState extends State<_CinematicLoadingOverlay> with SingleTickerProviderStateMixin {
-  late AnimationController _pulseController;
-
-  @override
-  void initState() {
-    super.initState();
-    _pulseController = AnimationController(vsync: this, duration: const Duration(seconds: 1))..repeat(reverse: true);
-  }
-
-  @override
-  void dispose() {
-    _pulseController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return BackdropFilter(
-      filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-      child: Container(
-        color: Colors.black.withValues(alpha: 0.4),
-        child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              AnimatedBuilder(
-                animation: _pulseController,
-                builder: (context, child) {
-                  return Transform.scale(
-                    scale: 1.0 + (_pulseController.value * 0.1),
-                    child: Opacity(
-                      opacity: 0.6 + (_pulseController.value * 0.4),
-                      child: child,
-                    ),
-                  );
-                },
-                child: Container(
-                  width: 80,
-                  height: 80,
-                  decoration: const BoxDecoration(color: Colors.black, shape: BoxShape.circle),
-                  child: Image.asset('assets/images/logo.png', width: 50, height: 50, fit: BoxFit.contain),
-                ),
-              ),
-              const SizedBox(height: 24),
-              const Text(
-                'ASSEMBLING AUDIT REPORT',
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, letterSpacing: 2, fontSize: 12),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'SYCHRONIZING INTELLIGENCE ENGINE...',
-                style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 9, fontWeight: FontWeight.w700),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-
 class _NavTile extends StatelessWidget {
   const _NavTile({
     required this.icon,
@@ -2139,72 +1354,3 @@ class _NavTile extends StatelessWidget {
     );
   }
 }
-
-class _CinematicLoadingOverlay extends StatefulWidget {
-  const _CinematicLoadingOverlay();
-
-  @override
-  State<_CinematicLoadingOverlay> createState() => _CinematicLoadingOverlayState();
-}
-
-class _CinematicLoadingOverlayState extends State<_CinematicLoadingOverlay> with SingleTickerProviderStateMixin {
-  late AnimationController _pulseController;
-
-  @override
-  void initState() {
-    super.initState();
-    _pulseController = AnimationController(vsync: this, duration: const Duration(seconds: 1))..repeat(reverse: true);
-  }
-
-  @override
-  void dispose() {
-    _pulseController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return BackdropFilter(
-      filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-      child: Container(
-        color: Colors.black.withValues(alpha: 0.4),
-        child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              AnimatedBuilder(
-                animation: _pulseController,
-                builder: (context, child) {
-                  return Transform.scale(
-                    scale: 1.0 + (_pulseController.value * 0.1),
-                    child: Opacity(
-                      opacity: 0.6 + (_pulseController.value * 0.4),
-                      child: child,
-                    ),
-                  );
-                },
-                child: Container(
-                  width: 80,
-                  height: 80,
-                  decoration: const BoxDecoration(color: Colors.black, shape: BoxShape.circle),
-                  child: Image.asset('assets/images/logo.png', width: 50, height: 50, fit: BoxFit.contain),
-                ),
-              ),
-              const SizedBox(height: 24),
-              const Text(
-                'ASSEMBLING AUDIT REPORT',
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, letterSpacing: 2, fontSize: 12),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'SYCHRONIZING INTELLIGENCE ENGINE...',
-                style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 9, fontWeight: FontWeight.w700),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-

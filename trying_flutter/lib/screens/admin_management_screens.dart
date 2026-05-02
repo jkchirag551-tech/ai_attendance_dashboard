@@ -263,32 +263,6 @@ class _FilterChip extends StatelessWidget {
   }
 }
 
-class _FaceGuidePainter extends CustomPainter {
-  final bool isAligned;
-  _FaceGuidePainter({required this.isAligned});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = isAligned ? Colors.green.withValues(alpha: 0.5) : Colors.white.withValues(alpha: 0.3)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 3.0;
-
-    final path = Path()
-      ..addOval(Rect.fromLTWH(
-        size.width * 0.1, 
-        size.height * 0.1, 
-        size.width * 0.8, 
-        size.height * 0.8,
-      ));
-
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
-}
-
 class MonthlyAttendanceScreen extends StatefulWidget {
   const MonthlyAttendanceScreen({super.key});
 
@@ -398,32 +372,6 @@ class _MonthlyAttendanceScreenState extends State<MonthlyAttendanceScreen> {
       ),
     );
   }
-}
-
-class _FaceGuidePainter extends CustomPainter {
-  final bool isAligned;
-  _FaceGuidePainter({required this.isAligned});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = isAligned ? Colors.green.withValues(alpha: 0.5) : Colors.white.withValues(alpha: 0.3)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 3.0;
-
-    final path = Path()
-      ..addOval(Rect.fromLTWH(
-        size.width * 0.1, 
-        size.height * 0.1, 
-        size.width * 0.8, 
-        size.height * 0.8,
-      ));
-
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
 
 class DailyAttendanceScreen extends StatefulWidget {
@@ -537,32 +485,6 @@ class _DailyAttendanceScreenState extends State<DailyAttendanceScreen> {
   }
 }
 
-class _FaceGuidePainter extends CustomPainter {
-  final bool isAligned;
-  _FaceGuidePainter({required this.isAligned});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = isAligned ? Colors.green.withValues(alpha: 0.5) : Colors.white.withValues(alpha: 0.3)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 3.0;
-
-    final path = Path()
-      ..addOval(Rect.fromLTWH(
-        size.width * 0.1, 
-        size.height * 0.1, 
-        size.width * 0.8, 
-        size.height * 0.8,
-      ));
-
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
-}
-
 class DayStudentsAttendanceScreen extends StatefulWidget {
   final String date;
   const DayStudentsAttendanceScreen({super.key, required this.date});
@@ -670,32 +592,6 @@ class _DayStudentsAttendanceScreenState extends State<DayStudentsAttendanceScree
       ),
     );
   }
-}
-
-class _FaceGuidePainter extends CustomPainter {
-  final bool isAligned;
-  _FaceGuidePainter({required this.isAligned});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = isAligned ? Colors.green.withValues(alpha: 0.5) : Colors.white.withValues(alpha: 0.3)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 3.0;
-
-    final path = Path()
-      ..addOval(Rect.fromLTWH(
-        size.width * 0.1, 
-        size.height * 0.1, 
-        size.width * 0.8, 
-        size.height * 0.8,
-      ));
-
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
 
 class AdminRegisterScreen extends StatefulWidget {
@@ -1109,30 +1005,4 @@ class _AdminRegisterScreenState extends State<AdminRegisterScreen> {
       ),
     );
   }
-}
-
-class _FaceGuidePainter extends CustomPainter {
-  final bool isAligned;
-  _FaceGuidePainter({required this.isAligned});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = isAligned ? Colors.green.withValues(alpha: 0.5) : Colors.white.withValues(alpha: 0.3)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 3.0;
-
-    final path = Path()
-      ..addOval(Rect.fromLTWH(
-        size.width * 0.1, 
-        size.height * 0.1, 
-        size.width * 0.8, 
-        size.height * 0.8,
-      ));
-
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
