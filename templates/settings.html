@@ -28,6 +28,16 @@
             --logo-bg: #000000;
         }
 
+        /* Fix for better dark mode visibility */
+        [data-theme="dark"] .glass-panel {
+            background: var(--surface-color);
+            border: 1px solid var(--card-border);
+        }
+
+        [data-theme="dark"] .day-chip input {
+            accent-color: var(--on-surface);
+        }
+
         body {
             background-color: var(--bg-color);
             color: var(--on-surface);

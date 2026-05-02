@@ -10,8 +10,14 @@ import 'services/notification_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  await NotificationService.initialize();
+  
+  try {
+    await Firebase.initializeApp();
+    await NotificationService.initialize();
+  } catch (e) {
+    debugPrint('Firebase initialization failed: $e');
+  }
+
   await OfflineCache.init();
   try {
     cameras = await availableCameras();
