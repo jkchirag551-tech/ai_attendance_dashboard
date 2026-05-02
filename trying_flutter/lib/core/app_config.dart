@@ -4,5 +4,5 @@ late List<CameraDescription> cameras;
 
 const String baseUrl = String.fromEnvironment(
   'BASE_URL',
-  defaultValue: 'http://192.168.0.100:5001',
+  defaultValue: 'https://ai-attendance-backend-3mvd.onrender.com',
 );
