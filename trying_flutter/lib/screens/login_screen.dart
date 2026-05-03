@@ -163,14 +163,12 @@ class _LoginHeroPanel extends StatelessWidget {
               Container(
                 width: 32, height: 32,
                 decoration: const BoxDecoration(color: Colors.black, shape: BoxShape.circle),
-                child: ClipOval(
-                  child: Image.asset(
-                    'assets/images/logo.png', 
-                    width: 32, 
-                    height: 32, 
-                    fit: BoxFit.contain, 
-                    errorBuilder: (_, __, ___) => const Icon(Icons.blur_on_rounded, color: Colors.white, size: 20),
-                  ),
+                child: Image.asset(
+                  'assets/images/logo.png', 
+                  width: 32, 
+                  height: 32, 
+                  fit: BoxFit.contain, 
+                  errorBuilder: (_, __, ___) => const Icon(Icons.blur_on_rounded, color: Colors.white, size: 20),
                 ),
               ),
               const SizedBox(width: 8),
@@ -261,14 +259,12 @@ class _LoginCard extends StatelessWidget {
                       ],
                     ),
                     child: Center(
-                      child: ClipOval(
-                        child: Image.asset(
-                          'assets/images/logo.png',
-                          width: 50,
-                          height: 50,
-                          fit: BoxFit.contain,
-                          errorBuilder: (_, __, ___) => Icon(Icons.blur_on_rounded, color: onSurface, size: 26),
-                        ),
+                      child: Image.asset(
+                        'assets/images/logo.png',
+                        width: 50,
+                        height: 50,
+                        fit: BoxFit.contain,
+                        errorBuilder: (_, __, ___) => Icon(Icons.blur_on_rounded, color: onSurface, size: 26),
                       ),
                     ),
                   ),
