@@ -17,3 +17,4 @@ eventlet==0.39.0
 gunicorn==23.0.0
 firebase-admin==6.6.0
 psycopg2-binary==2.9.9
+Flask-Mail==0.10.0

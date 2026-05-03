@@ -1,8 +1,8 @@
 import json
 from datetime import datetime, timedelta
-from flask import Blueprint, render_template, session, send_file, flash, redirect
+from flask import Blueprint, render_template, session, send_file, flash, redirect, request, jsonify
 from sqlalchemy import or_
-from models import Attendance, User, Settings
+from models import Attendance, User, Settings, Notice
 from utils import login_required, role_required
 from export_utils import build_attendance_excel, build_attendance_pdf
 
@@ -203,3 +203,44 @@ def capture():
         already_checked_in=already_checked_in,
         checkin_time=checkin_time
     )
+
+
+@student_bp.route('/settings')
+@login_required
+@role_required('student')
+def settings():
+    return render_template('student_settings.html')
+
+
+@student_bp.route('/create_notice', methods=['POST'])
+@login_required
+@role_required('student')
+def create_notice():
+    try:
+        from models import db
+        data = request.get_json()
+        content = (data.get('content') or '').strip()
+        category = data.get('category', 'Info')
+
+        if not content:
+            return jsonify({'status': 'error', 'message': 'Notice content is required.'}), 400
+
+        user = User.query.get(session.get('user_id'))
+        
+        # Create notice
+        notice = Notice(
+            author_name=user.fullname,
+            author_role=user.role,
+            content=content,
+            category=category,
+            created_at=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        )
+        
+        db.session.add(notice)
+        db.session.commit()
+        
+        return jsonify({'status': 'success', 'message': 'Notice posted successfully!'})
+    except Exception as e:
+        from models import db
+        db.session.rollback()
+        return jsonify({'status': 'error', 'message': f'Failed to post notice: {str(e)}'}), 500

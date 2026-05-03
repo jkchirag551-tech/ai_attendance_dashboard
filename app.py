@@ -12,6 +12,7 @@ from firebase_admin import credentials, messaging
 from flask import Flask, request, jsonify, send_from_directory, render_template
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit
+from flask_mail import Mail, Message as MailMessage
 from sqlalchemy import text
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -25,6 +26,7 @@ from routes.teacher import teacher_bp
 
 # Initialize SocketIO globally
 socketio = SocketIO(cors_allowed_origins="*")
+mail = Mail()
 
 def ensure_schema(app):
     with app.app_context():
@@ -77,6 +79,15 @@ def create_app():
     CORS(app_instance)
     db.init_app(app_instance)
     socketio.init_app(app_instance)
+    
+    # Mail Configuration
+    app_instance.config['MAIL_SERVER'] = 'smtp.gmail.com'
+    app_instance.config['MAIL_PORT'] = 587
+    app_instance.config['MAIL_USE_TLS'] = True
+    app_instance.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+    app_instance.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
+    app_instance.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_USERNAME')
+    mail.init_app(app_instance)
 
     # Initialize Firebase Admin
     try:
@@ -145,6 +156,24 @@ def create_app():
             "Your notification system is fully operational and synchronized with the MR.TECHLAB server."
         )
         return {"status": "success"}, 200
+
+    @app_instance.route('/api/admin/test_email', methods=['POST'])
+    def api_test_email():
+        data = request.get_json() or {}
+        email = data.get('email')
+        if not email:
+            return {"status": "error", "message": "No email provided"}, 400
+        
+        try:
+            msg = MailMessage(
+                "MR. TECHLAB System Test 📧",
+                recipients=[email],
+                body="This is a test email from your AI Attendance System. If you received this, your Gmail SMTP configuration is correct!"
+            )
+            mail.send(msg)
+            return {"status": "success", "message": f"Test email sent to {email}"}, 200
+        except Exception as e:
+            return {"status": "error", "message": str(e)}, 500
 
     def send_push_notification(token, title, body):
         if not token:
@@ -325,15 +354,24 @@ def create_app():
                 db.session.add(new_log)
                 db.session.commit()
 
-                # --- ANOMALY DETECTION & NOTIFICATION ---
+                # --- REAL-TIME NOTIFICATIONS ---
                 try:
+                    # 1. Instant Check-in Notification
+                    if user.fcm_token:
+                        send_push_notification(
+                            user.fcm_token,
+                            "Attendance Recorded ✅",
+                            f"Hi {user.fullname}, your attendance for {subject} has been verified at {new_log.time}."
+                        )
+
+                    # 2. Anomaly Detection (Low Attendance)
                     threshold = float(get_setting_value('low_attendance_threshold', '75.0'))
                     current_percentage = calculate_attendance_percentage(user.id)
                     if current_percentage < threshold:
                         send_push_notification(
                             user.fcm_token,
                             "Attendance Alert ⚠️",
-                            f"Your attendance is currently {current_percentage:.1f}%, which is below the {threshold}% threshold. Please maintain regular attendance."
+                            f"Your attendance is currently {current_percentage:.1f}%, which is below the {threshold}% threshold."
                         )
                 except Exception as e:
                     print(f"Notification Error: {e}")
@@ -378,9 +416,15 @@ def create_app():
                             notice.content
                         )
                     
-                    # 2. Simulated Email/SMS
+                    # 2. Real Email (via Gmail)
                     if data.get('broadcast_email') and user.email:
-                        print(f"DEBUG: Sending Email to {user.email}: {notice.content}")
+                        send_email_notification(
+                            user.email,
+                            f"New Notice: {notice.category} 📢",
+                            f"Hello {user.fullname},\n\nA new notice has been posted: {notice.category}\n\nContent:\n{notice.content}\n\nRegards,\nMR. TECHLAB System"
+                        )
+
+                    # 3. Simulated SMS (Still simulation)
                     if data.get('broadcast_sms') and user.phone:
                         print(f"DEBUG: Sending SMS to {user.phone}: {notice.content}")
 
@@ -535,6 +579,15 @@ def create_app():
         db.session.delete(event)
         db.session.commit()
         return {"status": "success"}, 200
+
+    def send_email_notification(recipient, subject, body):
+        try:
+            msg = MailMessage(subject, recipients=[recipient], body=body)
+            mail.send(msg)
+            return True
+        except Exception as e:
+            print(f"Mail Error: {e}")
+            return False
 
     # --- FLUTTER WEB BUNDLE ROUTES ---
     @app_instance.route('/')

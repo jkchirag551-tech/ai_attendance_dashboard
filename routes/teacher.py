@@ -2,7 +2,7 @@ import json
 from datetime import datetime, timedelta
 from flask import Blueprint, render_template, request, redirect, session, flash, jsonify, send_file, url_for
 from werkzeug.security import generate_password_hash
-from models import db, User, Settings, Attendance
+from models import db, User, Settings, Attendance, Notice
 from sqlalchemy import desc, or_
 from utils import login_required, role_required
 from export_utils import build_attendance_excel, build_attendance_pdf
@@ -346,3 +346,43 @@ def register_student():
         
     # If it's a GET request (just visiting the page), show the empty form
     return render_template('register_student.html', portal_role='teacher')
+
+
+@teacher_bp.route('/settings')
+@login_required
+@role_required('teacher')
+def settings():
+    return render_template('teacher_settings.html')
+
+
+@teacher_bp.route('/create_notice', methods=['POST'])
+@login_required
+@role_required('teacher')
+def create_notice():
+    try:
+        data = request.get_json()
+        content = (data.get('content') or '').strip()
+        category = data.get('category', 'Info')
+        audience = data.get('audience', 'all')
+
+        if not content:
+            return jsonify({'status': 'error', 'message': 'Notice content is required.'}), 400
+
+        user = User.query.get(session.get('user_id'))
+        
+        # Create notice
+        notice = Notice(
+            author_name=user.fullname,
+            author_role=user.role,
+            content=content,
+            category=category,
+            created_at=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        )
+        
+        db.session.add(notice)
+        db.session.commit()
+        
+        return jsonify({'status': 'success', 'message': 'Notice sent successfully!'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'status': 'error', 'message': f'Failed to send notice: {str(e)}'}), 500

@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from flask import Blueprint, render_template, request, jsonify, send_file, session
 from sqlalchemy import or_
 from werkzeug.security import generate_password_hash
-from models import Attendance, User, db, Settings
+from models import Attendance, User, db, Settings, Notice
 from utils import login_required, role_required
 from export_utils import build_attendance_excel, build_attendance_pdf
 
@@ -568,3 +568,36 @@ def register_student():
         error=error,
         portal_role='admin'
     )
+
+
+@admin_bp.route('/create_notice', methods=['POST'])
+@login_required
+@role_required('admin')
+def create_notice():
+    try:
+        data = request.get_json()
+        content = (data.get('content') or '').strip()
+        category = data.get('category', 'Info')
+        audience = data.get('audience', 'all')
+
+        if not content:
+            return jsonify({'status': 'error', 'message': 'Notice content is required.'}), 400
+
+        user = User.query.get(session.get('user_id'))
+        
+        # Create notice
+        notice = Notice(
+            author_name=user.fullname,
+            author_role=user.role,
+            content=content,
+            category=category,
+            created_at=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        )
+        
+        db.session.add(notice)
+        db.session.commit()
+        
+        return jsonify({'status': 'success', 'message': 'Notice created successfully!'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'status': 'error', 'message': f'Failed to create notice: {str(e)}'}), 500
