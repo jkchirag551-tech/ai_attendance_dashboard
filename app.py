@@ -183,6 +183,12 @@ def create_app():
                 title=title,
                 body=body,
             ),
+            android=messaging.AndroidConfig(
+                notification=messaging.AndroidNotification(
+                    channel_id='high_importance_channel',
+                    priority='high',
+                ),
+            ),
             token=token,
         )
         try:
@@ -409,7 +415,7 @@ def create_app():
 
                 for user in recipients:
                     # 1. Real Push Notification (Firebase)
-                    if user.fcm_token:
+                    if data.get('broadcast_push', True) and user.fcm_token:
                         send_push_notification(
                             user.fcm_token,
                             f"New Notice: {notice.category} 📢",

@@ -11,7 +11,7 @@ class PostNoticeDialog extends StatefulWidget {
 
   final String authorName;
   final String authorRole;
-  final Function(String, String, bool, bool) onPost;
+  final Function(String, String, bool, bool, bool) onPost;
 
   @override
   State<PostNoticeDialog> createState() => _PostNoticeDialogState();
@@ -21,6 +21,7 @@ class _PostNoticeDialogState extends State<PostNoticeDialog> {
   final _controller = TextEditingController();
   String _selectedCategory = 'Info';
   bool _isPosting = false;
+  bool _broadcastPush = true;
   bool _broadcastEmail = false;
   bool _broadcastSms = false;
 
@@ -71,6 +72,16 @@ class _PostNoticeDialogState extends State<PostNoticeDialog> {
             const SizedBox(height: 18),
             const SectionLabel('Broadcast options'),
             CheckboxListTile(
+              title: Text('Push Notification', style: TextStyle(color: onSurface, fontSize: 14)),
+              subtitle: Text('Visible on mobile notification tray', style: TextStyle(color: onSurface.withValues(alpha: 0.5), fontSize: 11)),
+              value: _broadcastPush,
+              onChanged: (v) => setState(() => _broadcastPush = v!),
+              contentPadding: EdgeInsets.zero,
+              dense: true,
+              activeColor: onSurface,
+              checkColor: theme.colorScheme.surface,
+            ),
+            CheckboxListTile(
               title: Text('Send via Email', style: TextStyle(color: onSurface, fontSize: 14)),
               value: _broadcastEmail,
               onChanged: (v) => setState(() => _broadcastEmail = v!),
@@ -99,7 +110,7 @@ class _PostNoticeDialogState extends State<PostNoticeDialog> {
               : () async {
                   if (_controller.text.trim().isEmpty) return;
                   setState(() => _isPosting = true);
-                  await widget.onPost(_controller.text.trim(), _selectedCategory, _broadcastEmail, _broadcastSms);
+                  await widget.onPost(_controller.text.trim(), _selectedCategory, _broadcastPush, _broadcastEmail, _broadcastSms);
                   if (context.mounted) Navigator.pop(context);
                 },
           style: FilledButton.styleFrom(backgroundColor: onSurface, foregroundColor: theme.colorScheme.surface),

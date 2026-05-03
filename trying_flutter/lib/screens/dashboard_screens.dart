@@ -1009,9 +1009,9 @@ class _Sidebar extends StatelessWidget {
       builder: (_) => PostNoticeDialog(
         authorName: username,
         authorRole: role,
-        onPost: (content, category, email, sms) async {
+        onPost: (content, category, push, email, sms) async {
           const api = AttendanceApiService();
-          await api.postNotice(content, username, role, category: category, broadcastEmail: email, broadcastSms: sms);
+          await api.postNotice(content, username, role, category: category, broadcastPush: push, broadcastEmail: email, broadcastSms: sms);
         },
       ),
     );

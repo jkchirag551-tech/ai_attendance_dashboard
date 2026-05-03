@@ -142,6 +142,7 @@ class AttendanceApiService {
     String authorName, 
     String authorRole, {
     String category = 'Info',
+    bool broadcastPush = true,
     bool broadcastEmail = false,
     bool broadcastSms = false,
   }) async {
@@ -153,6 +154,7 @@ class AttendanceApiService {
         'author_name': authorName,
         'author_role': authorRole,
         'category': category,
+        'broadcast_push': broadcastPush,
         'broadcast_email': broadcastEmail,
         'broadcast_sms': broadcastSms,
       }),
