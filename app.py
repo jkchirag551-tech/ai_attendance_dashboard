@@ -54,10 +54,11 @@ def ensure_schema(app):
         # Notices table updates
         notices_columns = [row['name'] for row in connection.execute(text('PRAGMA table_info(notices)')).mappings()]
         if 'category' not in notices_columns:
-            try:
-                connection.execute(text('ALTER TABLE notices ADD COLUMN category TEXT DEFAULT "Info"'))
-            except:
-                pass
+            connection.execute(text('ALTER TABLE notices ADD COLUMN category TEXT DEFAULT "Info"'))
+        if 'author_role' not in notices_columns:
+            connection.execute(text('ALTER TABLE notices ADD COLUMN author_role TEXT DEFAULT "admin"'))
+        if 'author_name' not in notices_columns:
+            connection.execute(text('ALTER TABLE notices ADD COLUMN author_name TEXT'))
 
         connection.commit()
         connection.close()
@@ -436,7 +437,14 @@ def create_app():
 
             return {"status": "success"}, 201
         notices = Notice.query.order_by(Notice.id.desc()).all()
-        return jsonify([{"id": n.id, "author_name": n.author_name, "content": n.content, "category": n.category, "created_at": n.created_at} for n in notices]), 200
+        return jsonify([{
+            "id": n.id, 
+            "author_name": n.author_name, 
+            "author_role": n.author_role,
+            "content": n.content, 
+            "category": n.category, 
+            "created_at": n.created_at
+        } for n in notices]), 200
 
     @app_instance.route('/api/admin/settings', methods=['GET'])
     def api_get_settings():

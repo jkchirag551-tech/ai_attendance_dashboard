@@ -86,9 +86,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       builder: (_) => PostNoticeDialog(
         authorName: widget.username,
         authorRole: widget.role,
-        onPost: (content, category, email, sms) async {
+        onPost: (content, category, push, email, sms) async {
           const api = AttendanceApiService();
-          await api.postNotice(content, widget.username, widget.role, category: category, broadcastEmail: email, broadcastSms: sms);
+          await api.postNotice(content, widget.username, widget.role, category: category, broadcastPush: push, broadcastEmail: email, broadcastSms: sms);
         },
       ),
     );
