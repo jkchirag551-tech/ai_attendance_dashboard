@@ -130,7 +130,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         Row(
                           children: [
                             Container(
-                              decoration: const BoxDecoration(color: Colors.black, shape: BoxShape.circle),
+                              decoration: const BoxDecoration(color: Colors.transparent, shape: BoxShape.circle),
                               child: Image.asset(
                                 'assets/images/logo.png', 
                                 width: 52, 

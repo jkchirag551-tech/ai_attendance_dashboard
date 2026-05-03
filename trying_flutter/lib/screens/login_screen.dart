@@ -251,18 +251,17 @@ class _LoginCard extends StatelessWidget {
                   Container(
                     width: 72, height: 72,
                     decoration: BoxDecoration(
-                      color: Colors.black, 
+                      color: Colors.transparent, 
                       shape: BoxShape.circle, 
-                      border: Border.all(color: onSurface.withValues(alpha: 0.1), width: 1),
                       boxShadow: [
-                        BoxShadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 10, offset: const Offset(0, 4))
+                        BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, 4))
                       ],
                     ),
                     child: Center(
                       child: Image.asset(
                         'assets/images/logo.png',
-                        width: 50,
-                        height: 50,
+                        width: 72,
+                        height: 72,
                         fit: BoxFit.contain,
                         errorBuilder: (_, __, ___) => Icon(Icons.blur_on_rounded, color: onSurface, size: 26),
                       ),

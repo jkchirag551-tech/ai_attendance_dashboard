@@ -612,10 +612,22 @@ def create_app():
     @app_instance.route('/<path:path>')
     def serve_flutter_assets(path):
         """Handles Flutter JS, CSS, and Asset requests"""
-        # First check if the file exists in templates (for index.html siblings)
-        if os.path.exists(os.path.join(app_instance.root_path, 'templates', path)):
+        # Check templates first (index.html siblings)
+        template_path = os.path.join(app_instance.root_path, 'templates', path)
+        if os.path.exists(template_path):
             return send_from_directory('templates', path)
-        # Then check in static
+        
+        # Check static folder
+        static_path = os.path.join(app_instance.root_path, 'static', path)
+        if os.path.exists(static_path):
+            return send_from_directory('static', path)
+            
+        # Handle Flutter's potential double-nesting for assets
+        if path.startswith('assets/'):
+            nested_path = os.path.join(app_instance.root_path, 'static', 'assets', path)
+            if os.path.exists(nested_path):
+                return send_from_directory(os.path.join('static', 'assets'), path)
+
         return send_from_directory('static', path)
 
     return app_instance
