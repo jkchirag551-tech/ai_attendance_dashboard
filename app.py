@@ -363,13 +363,22 @@ def create_app():
             db.session.commit()
 
             # Broadcast logic
-            if data.get('broadcast_email') or data.get('broadcast_sms'):
+            if data.get('broadcast_email') or data.get('broadcast_sms') or data.get('broadcast_push', True):
                 if notice.author_role == 'admin':
                     recipients = User.query.filter(User.role.in_(['student', 'teacher'])).all()
                 else:
                     recipients = User.query.filter(User.role == 'student').all()
 
                 for user in recipients:
+                    # 1. Real Push Notification (Firebase)
+                    if user.fcm_token:
+                        send_push_notification(
+                            user.fcm_token,
+                            f"New Notice: {notice.category} 📢",
+                            notice.content
+                        )
+                    
+                    # 2. Simulated Email/SMS
                     if data.get('broadcast_email') and user.email:
                         print(f"DEBUG: Sending Email to {user.email}: {notice.content}")
                     if data.get('broadcast_sms') and user.phone:

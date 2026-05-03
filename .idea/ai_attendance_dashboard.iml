@@ -96,6 +96,12 @@
       <excludeFolder url="file://$MODULE_DIR$/trying_flutter/windows/flutter/ephemeral/.plugin_symlinks/printing/example/.dart_tool" />
       <excludeFolder url="file://$MODULE_DIR$/trying_flutter/windows/flutter/ephemeral/.plugin_symlinks/printing/example/.pub" />
       <excludeFolder url="file://$MODULE_DIR$/trying_flutter/windows/flutter/ephemeral/.plugin_symlinks/printing/example/build" />
+      <excludeFolder url="file://$MODULE_DIR$/trying_flutter/windows/flutter/ephemeral/.plugin_symlinks/firebase_core/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/trying_flutter/windows/flutter/ephemeral/.plugin_symlinks/firebase_core/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/trying_flutter/windows/flutter/ephemeral/.plugin_symlinks/firebase_core/build" />
+      <excludeFolder url="file://$MODULE_DIR$/trying_flutter/windows/flutter/ephemeral/.plugin_symlinks/firebase_core/example/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/trying_flutter/windows/flutter/ephemeral/.plugin_symlinks/firebase_core/example/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/trying_flutter/windows/flutter/ephemeral/.plugin_symlinks/firebase_core/example/build" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.12 (ai_attendance_dashboard)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
