@@ -611,22 +611,24 @@ def create_app():
 
     @app_instance.route('/<path:path>')
     def serve_flutter_assets(path):
-        """Handles Flutter JS, CSS, and Asset requests"""
-        # Check templates first (index.html siblings)
-        template_path = os.path.join(app_instance.root_path, 'templates', path)
-        if os.path.exists(template_path):
+        """Handles Flutter JS, CSS, and Asset requests with deep path fallback"""
+        # 1. Check templates first (index.html siblings)
+        if os.path.exists(os.path.join(app_instance.root_path, 'templates', path)):
             return send_from_directory('templates', path)
         
-        # Check static folder
+        # 2. Check static folder directly
         static_path = os.path.join(app_instance.root_path, 'static', path)
         if os.path.exists(static_path):
             return send_from_directory('static', path)
             
-        # Handle Flutter's potential double-nesting for assets
-        if path.startswith('assets/'):
-            nested_path = os.path.join(app_instance.root_path, 'static', 'assets', path)
-            if os.path.exists(nested_path):
-                return send_from_directory(os.path.join('static', 'assets'), path)
+        # 3. Handle Flutter's potential double-nesting or missing prefixes
+        if 'assets/' in path:
+            filename = path.split('/')[-1]
+            if any(path.endswith(ext) for ext in ['.png', '.jpg', '.jpeg', '.gif', '.svg']):
+                for search_dir in ['static/images', 'static/assets/images', 'static/assets/assets/images']:
+                    potential_path = os.path.join(app_instance.root_path, search_dir, filename)
+                    if os.path.exists(potential_path):
+                        return send_from_directory(search_dir, filename)
 
         return send_from_directory('static', path)
 
