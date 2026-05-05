@@ -53,8 +53,10 @@
 
         .brand-logo-container {
             width: 48px; height: 48px;
-            background: #000000; border-radius: 50%;
+            background: #000000 !important;
+            border-radius: 12px;
             display: flex; align-items: center; justify-content: center;
+            padding: 5px;
         }
 
         .glass-panel {
@@ -136,7 +138,7 @@
         <div class="container-fluid">
             <a class="navbar-brand" href="/">
                 <div class="brand-logo-container">
-                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" style="width:100%; height:100%; object-fit:contain; filter: contrast(1.1);">
+                    <img src="{{ url_for('static', filename='images/logo.png', v='1.1') }}" alt="Logo" style="width:100%; height:100%; object-fit:contain;">
                 </div>
                 <span>MR. Attendance</span>
             </a>
