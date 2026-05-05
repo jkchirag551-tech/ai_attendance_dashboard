@@ -123,12 +123,19 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       children: [
                         Row(
                           children: [
-                            Image.asset(
-                              'assets/images/logo.png',
+                            Container(
                               width: 44,
                               height: 44,
-                              fit: BoxFit.contain,
-                              errorBuilder: (_, __, ___) => const Icon(Icons.blur_on_rounded, size: 30, color: Colors.white)
+                              decoration: const BoxDecoration(
+                                color: Colors.black,
+                                shape: BoxShape.circle,
+                              ),
+                              padding: const EdgeInsets.all(6),
+                              child: Image.asset(
+                                'assets/images/logo.png',
+                                fit: BoxFit.contain,
+                                errorBuilder: (_, __, ___) => const Icon(Icons.blur_on_rounded, size: 24, color: Colors.white)
+                              ),
                             ),
                             const SizedBox(width: 12),
                             Text('Mr. Attendance', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: onSurface, letterSpacing: 0.5)),

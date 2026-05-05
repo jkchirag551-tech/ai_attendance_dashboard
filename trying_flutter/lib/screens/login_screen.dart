@@ -228,41 +228,32 @@ class _LoginCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-              Stack(
-                alignment: Alignment.center,
-                children: [
                   Container(
-                    width: 76,
-                    height: 76,
+                    width: 64,
+                    height: 64,
                     decoration: BoxDecoration(
+                      color: Colors.black,
                       shape: BoxShape.circle,
-                      gradient: RadialGradient(
-                        colors: [
-                          onSurface.withValues(alpha: 0.1),
-                          Colors.transparent,
-                        ],
-                      ),
-                    ),
-                  ),
-                  Container(
-                    width: 60, height: 60,
-                    decoration: const BoxDecoration(
-                      color: Colors.transparent, 
-                      shape: BoxShape.circle, 
+                      boxShadow: [
+                        BoxShadow(
+                          color: onSurface.withValues(alpha: 0.1),
+                          blurRadius: 12,
+                          spreadRadius: 2,
+                        ),
+                      ],
                     ),
                     child: Center(
-                      child: Image.asset(
-                        'assets/images/logo.png',
-                        width: 60,
-                        height: 60,
-                        fit: BoxFit.contain,
-                        errorBuilder: (_, __, ___) => Icon(Icons.blur_on_rounded, color: onSurface, size: 26),
+                      child: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Image.asset(
+                          'assets/images/logo.png',
+                          fit: BoxFit.contain,
+                          errorBuilder: (_, __, ___) => const Icon(Icons.blur_on_rounded, color: Colors.white, size: 24),
+                        ),
                       ),
                     ),
                   ),
-                ],
-              ),
-                  const SizedBox(width: 14),
+                  const SizedBox(width: 16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start, 
