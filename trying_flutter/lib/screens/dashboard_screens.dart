@@ -322,8 +322,8 @@ class _CinematicLoadingOverlayState extends State<_CinematicLoadingOverlay> with
                 child: Container(
                   width: 80,
                   height: 80,
-                  decoration: const BoxDecoration(color: Colors.black, shape: BoxShape.circle),
-                  child: Image.asset('assets/images/logo.png', width: 50, height: 50, fit: BoxFit.contain),
+                  decoration: const BoxDecoration(color: Colors.transparent, shape: BoxShape.circle),
+                  child: Image.asset('assets/images/logo.png', width: 70, height: 70, fit: BoxFit.contain),
                 ),
               ),
               const SizedBox(height: 24),
@@ -1045,15 +1045,12 @@ class _Sidebar extends StatelessWidget {
         children: [
           Row(
             children: [
-              Container(
-                decoration: const BoxDecoration(color: Colors.black, shape: BoxShape.circle),
-                child: Image.asset(
-                  'assets/images/logo.png',
-                  width: 38,
-                  height: 38,
-                  fit: BoxFit.contain,
-                  errorBuilder: (_, __, ___) => const Icon(Icons.blur_on_rounded, color: Colors.white, size: 24),
-                ),
+              Image.asset(
+                'assets/images/logo.png',
+                width: 38,
+                height: 38,
+                fit: BoxFit.contain,
+                errorBuilder: (_, __, ___) => const Icon(Icons.blur_on_rounded, color: Colors.white, size: 24),
               ),
               const SizedBox(width: 12),
               Text('Mr. Attendance', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: onSurface)),

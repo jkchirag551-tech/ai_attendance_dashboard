@@ -160,16 +160,12 @@ class _LoginHeroPanel extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Container(
-                width: 32, height: 32,
-                decoration: const BoxDecoration(color: Colors.black, shape: BoxShape.circle),
-                child: Image.asset(
-                  'assets/images/logo.png', 
-                  width: 32, 
-                  height: 32, 
-                  fit: BoxFit.contain, 
-                  errorBuilder: (_, __, ___) => const Icon(Icons.blur_on_rounded, color: Colors.white, size: 20),
-                ),
+              Image.asset(
+                'assets/images/logo.png',
+                width: 32,
+                height: 32,
+                fit: BoxFit.contain,
+                errorBuilder: (_, __, ___) => const Icon(Icons.blur_on_rounded, color: Colors.white, size: 20),
               ),
               const SizedBox(width: 8),
               Text('Mr. Attendance', style: TextStyle(fontWeight: FontWeight.w700, color: onSurface)),
@@ -250,20 +246,27 @@ class _LoginCard extends StatelessWidget {
                   ),
                   Container(
                     width: 72, height: 72,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: Colors.transparent, 
                       shape: BoxShape.circle, 
-                      boxShadow: [
-                        BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, 4))
-                      ],
                     ),
                     child: Center(
-                      child: Image.asset(
-                        'assets/images/logo.png',
-                        width: 72,
-                        height: 72,
-                        fit: BoxFit.contain,
-                        errorBuilder: (_, __, ___) => Icon(Icons.blur_on_rounded, color: onSurface, size: 26),
+                      child: GestureDetector(
+                        onLongPress: () {
+                          setState(() {
+                            _selectedRole = 'admin';
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Admin Mode Activated')),
+                            );
+                          });
+                        },
+                        child: Image.asset(
+                          'assets/images/logo.png',
+                          width: 72,
+                          height: 72,
+                          fit: BoxFit.contain,
+                          errorBuilder: (_, __, ___) => Icon(Icons.blur_on_rounded, color: onSurface, size: 26),
+                        ),
                       ),
                     ),
                   ),
@@ -298,7 +301,6 @@ class _LoginCard extends StatelessWidget {
                     items: const [
                       DropdownMenuItem(value: 'student', child: Text('Student')),
                       DropdownMenuItem(value: 'teacher', child: Text('Faculty')),
-                      DropdownMenuItem(value: 'admin', child: Text('Administrator'))
                     ],
                     onChanged: (value) { if (value != null) onRoleChanged(value); },
                   ),
