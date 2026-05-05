@@ -102,6 +102,9 @@
       <excludeFolder url="file://$MODULE_DIR$/trying_flutter/windows/flutter/ephemeral/.plugin_symlinks/firebase_core/example/.dart_tool" />
       <excludeFolder url="file://$MODULE_DIR$/trying_flutter/windows/flutter/ephemeral/.plugin_symlinks/firebase_core/example/.pub" />
       <excludeFolder url="file://$MODULE_DIR$/trying_flutter/windows/flutter/ephemeral/.plugin_symlinks/firebase_core/example/build" />
+      <excludeFolder url="file://$MODULE_DIR$/trying_flutter/linux/flutter/ephemeral/.plugin_symlinks/flutter_local_notifications_linux/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/trying_flutter/linux/flutter/ephemeral/.plugin_symlinks/flutter_local_notifications_linux/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/trying_flutter/linux/flutter/ephemeral/.plugin_symlinks/flutter_local_notifications_linux/build" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.12 (ai_attendance_dashboard)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />

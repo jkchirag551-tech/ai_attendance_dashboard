@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pending Approvals | MR. Attendance</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #FDFDFD;
+            --surface-color: #FFFFFF;
+            --on-surface: #000000;
+            --card-border: rgba(0, 0, 0, 0.08);
+            --text-muted: rgba(0, 0, 0, 0.4);
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #000000;
+            --surface-color: #0F172A;
+            --on-surface: #FFFFFF;
+            --card-border: rgba(255, 255, 255, 0.08);
+            --text-muted: rgba(255, 255, 255, 0.4);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--on-surface);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            transition: all 0.3s ease;
+            min-height: 100vh;
+            padding-top: 100px;
+        }
+
+        .top-bar {
+            background: var(--surface-color) !important;
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--card-border);
+            padding: 12px 40px;
+        }
+
+        .navbar-brand {
+            display: flex; align-items: center; gap: 15px;
+            font-weight: 900; color: var(--on-surface) !important;
+            letter-spacing: -1px; font-size: 1.4rem;
+        }
+
+        .brand-logo-container {
+            width: 48px; height: 48px;
+            background: transparent !important; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
+        }
+
+        .nav-link {
+            color: var(--on-surface) !important; opacity: 0.5;
+            font-weight: 700; padding: 10px 20px !important;
+            border-radius: 14px; transition: all 0.3s ease;
+        }
+        .nav-link:hover, .nav-link.active {
+            opacity: 1; background: var(--on-surface); color: var(--bg-color) !important;
+        }
+
+        .glass-panel {
+            background: var(--surface-color);
+            border: 1px solid var(--card-border);
+            border-radius: 28px;
+            padding: 30px;
+            margin-bottom: 24px;
+        }
+
+        .student-card {
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--surface-color);
+        }
+
+        .student-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .student-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--on-surface);
+        }
+
+        .btn-approve { background: #10b981; color: white; border-radius: 12px; font-weight: 700; border: none; padding: 8px 20px; }
+        .btn-reject { background: #ef4444; color: white; border-radius: 12px; font-weight: 700; border: none; padding: 8px 20px; }
+
+        .theme-toggle {
+            cursor: pointer; width: 48px; height: 48px;
+            border-radius: 14px; background: var(--on-surface);
+            color: var(--bg-color); display: flex;
+            align-items: center; justify-content: center;
+            margin-left: 15px;
+        }
+    </style>
+</head>
+<body data-theme="light">
+    <nav class="navbar navbar-expand-lg top-bar fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                <div class="brand-logo-container">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" style="width:100%; height:100%; object-fit:contain;">
+                </div>
+                <span>MR. Attendance</span>
+            </a>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.welcome') }}">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% if portal_role == 'teacher' %}{{ url_for('teacher.dashboard') }}{% else %}{{ url_for('admin.admin_dashboard') }}{% endif %}">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="#">Approvals</a></li>
+                    <li class="nav-item"><div class="theme-toggle" onclick="toggleTheme()"><i class="fas fa-moon" id="theme-icon"></i></div></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row mb-4">
+            <div class="col-12">
+                <h1 style="font-weight: 900; letter-spacing: -2px;">Pending Student Approvals</h1>
+                <p class="text-muted">Review and approve new student registrations.</p>
+            </div>
+        </div>
+
+        <div class="glass-panel">
+            {% if students %}
+                {% for student in students %}
+                <div class="student-card" id="student-row-{{ student.id }}">
+                    <div class="student-info">
+                        <div>
+                            <h5 class="mb-1 fw-bold">{{ student.fullname }}</h5>
+                            <p class="mb-0 small opacity-75">ID: {{ student.userid }} | @{{ student.username }}</p>
+                            <p class="mb-0 small opacity-75">{{ student.email }} | {{ student.phone }}</p>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button onclick="approveStudent({{ student.id }})" class="btn-approve">Approve</button>
+                        <button onclick="rejectStudent({{ student.id }})" class="btn-reject">Reject</button>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-user-clock fa-3x mb-3 opacity-25"></i>
+                    <p class="fw-bold opacity-50">No pending registrations at the moment.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        function toggleTheme() {
+            const body = document.body;
+            const next = body.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+            body.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            document.getElementById('theme-icon').className = next === 'light' ? 'fas fa-moon' : 'fas fa-sun';
+        }
+
+        async function approveStudent(userId) {
+            const url = `{% if portal_role == 'teacher' %}{{ url_for('teacher.approve_student', user_id=0) }}{% else %}{{ url_for('admin.approve_student', user_id=0) }}{% endif %}`.replace('0', userId);
+            try {
+                const response = await fetch(url, { method: 'POST' });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    document.getElementById(`student-row-${userId}`).remove();
+                    if (document.querySelectorAll('.student-card').length === 0) {
+                        location.reload();
+                    }
+                } else {
+                    alert(result.message);
+                }
+            } catch (err) {
+                alert('An error occurred.');
+            }
+        }
+
+        async function rejectStudent(userId) {
+            if (!confirm('Are you sure you want to reject and delete this registration?')) return;
+            const url = `{% if portal_role == 'teacher' %}{{ url_for('teacher.reject_student', user_id=0) }}{% else %}{{ url_for('admin.reject_student', user_id=0) }}{% endif %}`.replace('0', userId);
+            try {
+                const response = await fetch(url, { method: 'POST' });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    document.getElementById(`student-row-${userId}`).remove();
+                    if (document.querySelectorAll('.student-card').length === 0) {
+                        location.reload();
+                    }
+                } else {
+                    alert(result.message);
+                }
+            } catch (err) {
+                alert('An error occurred.');
+            }
+        }
+    </script>
+</body>
+</html>

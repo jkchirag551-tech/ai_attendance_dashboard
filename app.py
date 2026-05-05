@@ -41,6 +41,8 @@ def ensure_schema(app):
             connection.execute(text('ALTER TABLE users ADD COLUMN phone TEXT'))
         if 'fcm_token' not in users_columns:
             connection.execute(text('ALTER TABLE users ADD COLUMN fcm_token TEXT'))
+        if 'is_approved' not in users_columns:
+            connection.execute(text('ALTER TABLE users ADD COLUMN is_approved BOOLEAN DEFAULT 1'))
 
         # Attendance table updates
         attendance_columns = [row['name'] for row in connection.execute(text('PRAGMA table_info(attendance)')).mappings()]
@@ -208,6 +210,9 @@ def create_app():
         user = User.query.filter_by(username=username).first()
         
         if user and check_password_hash(user.password, password):
+            if not user.is_approved:
+                return {"status": "error", "message": "Account pending approval"}, 403
+            
             # Strict role verification: prevent student from logging in as admin/teacher and vice versa
             if requested_role and user.role != requested_role:
                 return {
@@ -504,6 +509,7 @@ def create_app():
         return jsonify([{
             "id": u.id, "fullname": u.fullname, "username": u.username,
             "userid": u.userid, "role": u.role, "email": u.email, "phone": u.phone,
+            "is_approved": u.is_approved,
             "attendance_percentage": calculate_attendance_percentage(u.id)
         } for u in users]), 200
 

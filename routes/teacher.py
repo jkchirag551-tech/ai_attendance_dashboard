@@ -125,7 +125,7 @@ def dashboard():
     
     # Get ALL students so the teacher can view their attendance
     search_name = (request.args.get('search') or '').strip()
-    students_query = User.query.filter_by(role='student')
+    students_query = User.query.filter_by(role='student', is_approved=True)
     if search_name:
         search_pattern = f'%{search_name}%'
         students_query = students_query.filter(
@@ -177,7 +177,7 @@ def logs():
 
     attendance_query, filter_type = get_teacher_attendance_query(filter_type, selected_date, search_name)
     attendance_records = attendance_query.order_by(desc(Attendance.id)).limit(100).all()
-    students_query = User.query.filter_by(role='student')
+    students_query = User.query.filter_by(role='student', is_approved=True)
     if search_name:
         search_pattern = f'%{search_name}%'
         students_query = students_query.filter(
@@ -386,3 +386,33 @@ def create_notice():
     except Exception as e:
         db.session.rollback()
         return jsonify({'status': 'error', 'message': f'Failed to send notice: {str(e)}'}), 500
+
+
+@teacher_bp.route('/pending_approvals')
+@login_required
+@role_required('teacher')
+def pending_approvals():
+    pending_students = User.query.filter_by(role='student', is_approved=False).all()
+    return render_template('pending_approvals.html', students=pending_students, portal_role='teacher')
+
+
+@teacher_bp.route('/approve_student/<int:user_id>', methods=['POST'])
+@login_required
+@role_required('teacher')
+def approve_student(user_id):
+    user = User.query.get_or_404(user_id)
+    user.is_approved = True
+    db.session.commit()
+    return jsonify({'status': 'success', 'message': f'Student {user.fullname} approved successfully.'})
+
+
+@teacher_bp.route('/reject_student/<int:user_id>', methods=['POST'])
+@login_required
+@role_required('teacher')
+def reject_student(user_id):
+    user = User.query.get_or_404(user_id)
+    if not user.is_approved:
+        db.session.delete(user)
+        db.session.commit()
+        return jsonify({'status': 'success', 'message': f'Student {user.fullname} registration rejected.'})
+    return jsonify({'status': 'error', 'message': 'Cannot reject already approved student.'}), 400

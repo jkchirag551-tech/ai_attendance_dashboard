@@ -287,7 +287,7 @@ def export_attendance(filetype):
 def student_list():
     search_name = (request.args.get('search') or '').strip()
 
-    students_query = User.query.filter_by(role='student')
+    students_query = User.query.filter_by(role='student', is_approved=True)
     if search_name:
         search_pattern = f'%{search_name}%'
         students_query = students_query.filter(
@@ -328,6 +328,36 @@ def student_list():
         student.attendance_percentage = calculate_attendance_percentage(student.id)
     
     return render_template('student_list.html', students=students, teachers=teachers, admins=admins, search_name=search_name)
+
+
+@admin_bp.route('/pending_approvals')
+@login_required
+@role_required('admin')
+def pending_approvals():
+    pending_students = User.query.filter_by(role='student', is_approved=False).all()
+    return render_template('pending_approvals.html', students=pending_students, portal_role='admin')
+
+
+@admin_bp.route('/approve_student/<int:user_id>', methods=['POST'])
+@login_required
+@role_required('admin')
+def approve_student(user_id):
+    user = User.query.get_or_404(user_id)
+    user.is_approved = True
+    db.session.commit()
+    return jsonify({'status': 'success', 'message': f'Student {user.fullname} approved successfully.'})
+
+
+@admin_bp.route('/reject_student/<int:user_id>', methods=['POST'])
+@login_required
+@role_required('admin')
+def reject_student(user_id):
+    user = User.query.get_or_404(user_id)
+    if not user.is_approved:
+        db.session.delete(user)
+        db.session.commit()
+        return jsonify({'status': 'success', 'message': f'Student {user.fullname} registration rejected.'})
+    return jsonify({'status': 'error', 'message': 'Cannot reject already approved student here.'}), 400
 
 
 @admin_bp.route('/student_details/<int:student_id>')

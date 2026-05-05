@@ -17,6 +17,7 @@ class User(db.Model):
     phone = db.Column(db.String(20), nullable=True)
     face_encoding = db.Column(db.Text, nullable=True)
     fcm_token = db.Column(db.String(256), nullable=True)
+    is_approved = db.Column(db.Boolean, default=True)
 
     attendance_records = db.relationship(
         'Attendance', back_populates='user', cascade='all, delete-orphan'

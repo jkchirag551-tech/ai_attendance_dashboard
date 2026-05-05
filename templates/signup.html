@@ -3,11 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up | MR. Attendance</title>
-    <link rel="shortcut icon" href="images/MR.TECHLAB.png" type="image/png">
+    <title>Student Signup | MR. Attendance</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
@@ -17,7 +15,6 @@
             --card-border: rgba(0, 0, 0, 0.08);
             --card-shadow: rgba(0, 0, 0, 0.04);
             --text-muted: rgba(0, 0, 0, 0.4);
-            --logo-bg: #000000;
         }
 
         [data-theme="dark"] {
@@ -27,182 +24,106 @@
             --card-border: rgba(255, 255, 255, 0.08);
             --card-shadow: rgba(0, 0, 0, 0.4);
             --text-muted: rgba(255, 255, 255, 0.4);
-            --logo-bg: #000000;
         }
 
-        /* Define the animation */
-        @keyframes fadeSlideUp {
-            0% { opacity: 0; transform: translateY(30px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Ensure body takes full screen and centers the card */
         body {
-            margin: 0;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #f8fafc;
+            background-color: var(--bg-color);
+            color: var(--on-surface);
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            overflow: hidden; /* Prevents scrollbars from video */
+            transition: all 0.3s ease;
+            min-height: 100vh;
+            padding-top: 100px;
+            overflow-x: hidden;
         }
 
-        /* Position the video to cover the entire screen */
-        .bg-video {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            min-width: 100%;
-            min-height: 100%;
-            width: auto;
-            height: auto;
-            transform: translateX(-50%) translateY(-50%); /* Keeps it perfectly centered */
-            z-index: -2; /* Sends it to the very back */
-            object-fit: cover; /* Ensures no black bars */
-            filter: grayscale(30%); /* Optional: Slightly desaturate for a more corporate look */
+        .bg-glow {
+            position: fixed; width: 600px; height: 600px; border-radius: 50%;
+            background: radial-gradient(circle, var(--on-surface), transparent);
+            opacity: 0.015; z-index: -1; pointer-events: none;
+        }
+        .glow-1 { top: -100px; right: -50px; }
+        .glow-2 { bottom: -80px; left: -60px; width: 700px; height: 700px; opacity: 0.01; }
+
+        .top-bar {
+            background: var(--surface-color) !important;
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--card-border);
+            padding: 12px 40px;
         }
 
-        /* The Dark Overlay - This makes it look "Formal" */
-        .video-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1; /* Sits between the video and the login card */
-            background: rgba(15, 23, 42, 0.65); /* Deep slate tint */
-            /* Optional: Add a subtle vignette (darker edges) */
-            background-image: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.4) 100%);
+        .navbar-brand {
+            display: flex; align-items: center; gap: 15px;
+            font-weight: 900; color: var(--on-surface) !important;
+            letter-spacing: -1px; font-size: 1.4rem;
         }
 
         .brand-logo-container {
-            width: 80px; height: 80px;
+            width: 48px; height: 48px;
             background: transparent !important; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            overflow: hidden; margin: 0 auto 30px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.25);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
 
-        /* 2. Elegant, Structured Glassmorphism Card */
-        .signup-card {
-            background: rgba(255, 255, 255, 0.03); /* Barely there white tint */
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-top: 1px solid rgba(255, 255, 255, 0.2); /* Soft top highlight */
-            border-radius: 20px;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+        .glass-panel {
+            background: var(--surface-color);
+            border: 1px solid var(--card-border);
+            border-radius: 28px;
+            box-shadow: 0 10px 40px var(--card-shadow);
             padding: 40px;
-            max-width: 500px;
-            width: 100%;
-            text-align: center;
-            animation: fadeSlideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            margin-bottom: 24px;
         }
 
-        /* 3. Formal Typography */
-        .signup-card h2 {
-            color: #ffffff;
-            font-weight: 500;
-            letter-spacing: 0.5px;
-            margin-bottom: 30px;
+        .input-pro {
+            background: #FFFFFF;
+            border: 1px solid rgba(0, 0, 0, 0.12);
+            border-radius: 16px; padding: 16px 20px; color: #000000;
+            font-weight: 600; width: 100%; transition: all 0.2s ease;
+        }
+        [data-theme="dark"] .input-pro {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.15);
+            color: #FFFFFF;
+        }
+        .input-pro:focus { outline: none; border-color: var(--on-surface); }
+
+        .video-box {
+            border-radius: 24px; overflow: hidden; background: #000;
+            aspect-ratio: 4/3; width: 100%; position: relative;
+        }
+        #videoFeed { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+
+        .btn-custom {
+            background: var(--on-surface); color: var(--bg-color);
+            border-radius: 18px; padding: 16px 32px;
+            font-weight: 800; border: none; transition: all 0.3s ease;
+            text-transform: uppercase; letter-spacing: 1px;
         }
 
-        .signup-card h2 i {
-            color: #38bdf8; /* Professional light blue accent */
-        }
-
-        /* 4. Structured, Clean Inputs */
-        .form-floating > .form-control, .form-select {
-            background: #FFFFFF !important;
-            border: 1px solid rgba(0, 0, 0, 0.12) !important;
-            border-radius: 10px;
-            color: #000000 !important;
-            padding-left: 15px;
+        .btn-outline-pro {
+            border: 1px solid var(--on-surface);
+            color: var(--on-surface);
+            background: transparent;
             transition: all 0.3s ease;
         }
-        [data-theme="dark"] .form-floating > .form-control, [data-theme="dark"] .form-select {
-            background: rgba(255, 255, 255, 0.05) !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
-            color: #FFFFFF !important;
+        .btn-outline-pro:hover {
+            background: var(--on-surface);
+            color: var(--bg-color);
         }
 
-        .input-group-text {
-            background: rgba(255, 255, 255, 0.05) !important;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-right: none;
-            border-radius: 10px 0 0 10px;
-            color: #94a3b8;
+        .theme-toggle {
+            cursor: pointer; width: 48px; height: 48px;
+            border-radius: 14px; background: var(--on-surface);
+            color: var(--bg-color); display: flex;
+            align-items: center; justify-content: center;
+            margin-left: 15px;
         }
 
-        /* Fix input borders to connect with the icon */
-        .form-floating > .form-control {
-            border-left: none;
-            border-radius: 0 10px 10px 0;
-        }
-
-        /* 5. Focus States (Elegant Glow instead of Neon) */
-        .form-floating > .form-control:focus, .form-select:focus {
-            background: rgba(255, 255, 255, 0.08) !important;
-            border-color: #38bdf8;
-            box-shadow: none !important; /* Removes default bootstrap glow */
-        }
-
-        .input-group:focus-within .input-group-text {
-            border-color: #38bdf8;
-            color: #38bdf8;
-        }
-
-        .form-floating > label {
-            color: #94a3b8;
-            padding-left: 10px;
-        }
-
-        .form-floating > .form-control:focus ~ label,
-        .form-floating > .form-control:not(:placeholder-shown) ~ label {
-            color: #38bdf8;
-        }
-
-        /* 6. Professional Primary Button */
-        .btn-signup {
-            background: #0ea5e9;
-            border: none;
-            border-radius: 10px; /* Matching the input radius */
-            padding: 12px 30px;
-            color: white;
-            font-weight: 600;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
-            margin-top: 10px;
-        }
-
-        .btn-signup:hover {
-            background: #0284c7;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(14, 165, 233, 0.4);
-        }
-
-        .alert-danger {
-            border-radius: 10px;
-            border: none;
-            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
-            color: white;
-        }
-        .toggle-link {
-            text-align: center;
-            margin-top: 25px;
-        }
-        .toggle-link a {
-            color: #3498db;
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.3s ease;
-        }
-        .toggle-link a:hover {
-            color: #2980b9;
-            text-decoration: underline;
+        .section-label {
+            font-size: 11px; font-weight: 800;
+            text-transform: uppercase; letter-spacing: 1.5px;
+            color: var(--text-muted); margin-bottom: 25px;
+            display: block;
         }
     </style>
 </head>
@@ -213,107 +134,134 @@
     <nav class="navbar navbar-expand-lg top-bar fixed-top">
         <div class="container-fluid">
             <a class="navbar-brand" href="/">
-                <div class="brand-logo-container" style="width: 48px; height: 48px; margin: 0;">
-                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" style="width:100%; height:100%; object-fit:contain; filter: contrast(1.1);">
+                <div class="brand-logo-container">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" style="width:100%; height:100%; object-fit:contain;">
                 </div>
                 <span>MR. Attendance</span>
             </a>
+            <div class="ms-auto d-flex align-items-center">
+                <a href="{{ url_for('auth.login') }}" class="btn btn-sm btn-outline-pro rounded-pill px-3 me-3">Login</a>
+                <div class="theme-toggle" onclick="toggleTheme()"><i class="fas fa-moon" id="theme-icon"></i></div>
+            </div>
         </div>
     </nav>
 
-    <video class="bg-video" autoplay loop muted playsinline>
-        <source src="videos/hero-video.mp4" type="video/mp4">
-    </video>
-
-    <div class="video-overlay"></div>
-
-    <div class="signup-card">
-        <div class="brand-logo-container">
-            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" style="width:100%; height:100%; object-fit:contain; filter: contrast(1.1);">
+    <div class="container px-lg-5">
+        <div class="row mb-5 text-center">
+            <div class="col-12">
+                <h1 class="display-4" style="font-weight: 900; letter-spacing: -2px;">Student Signup</h1>
+                <span class="section-label">Join the MR. Attendance Workspace</span>
+            </div>
         </div>
-        <h2><i class="fas fa-user-plus me-2"></i>Create Account</h2>
-        
-        {% if error %}
-            <div class="alert alert-danger" role="alert">
-                <i class="fas fa-exclamation-triangle me-2"></i>{{ error }}
-            </div>
-        {% endif %}
 
-        <form action="/signup" method="POST">
-            <div class="form-floating mb-3">
-                <select class="form-select" name="role" id="role" required>
-                    <option value="student">👨‍🎓 Student</option>
-                    <option value="admin">👨‍💼 Administrator</option>
-                </select>
-                <label for="role"><i class="fas fa-user-tag me-2"></i>I am a...</label>
-            </div>
-
-            <div class="input-group mb-3">
-                <span class="input-group-text"><i class="fas fa-user"></i></span>
-                <div class="form-floating">
-                    <input type="text" class="form-control" id="fullname" name="fullname" placeholder="Full Name" required>
-                    <label for="fullname">Full Name</label>
+        <div class="row justify-content-center">
+            <div class="col-lg-11">
+                {% if success %}
+                <div class="alert alert-success rounded-4 p-4 mb-4">
+                    <h4 class="alert-heading fw-bold"><i class="fas fa-check-circle me-2"></i>Registration Received!</h4>
+                    <p class="mb-0">{{ success }}</p>
+                    <hr>
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-success rounded-pill px-4 mt-2">Go to Login</a>
                 </div>
-            </div>
+                {% endif %}
 
-            <div class="input-group mb-3">
-                <span class="input-group-text"><i class="fas fa-id-card"></i></span>
-                <div class="form-floating">
-                    <input type="text" class="form-control" id="userid" name="userid" placeholder="Student/Staff ID" required>
-                    <label for="userid">Student/Staff ID</label>
+                {% if error %}
+                <div class="alert alert-danger rounded-4 p-4 mb-4">
+                    <i class="fas fa-exclamation-triangle me-2"></i>{{ error }}
                 </div>
-            </div>
+                {% endif %}
 
-            <div class="input-group mb-3">
-                <span class="input-group-text"><i class="fas fa-at"></i></span>
-                <div class="form-floating">
-                    <input type="text" class="form-control" id="username" name="username" placeholder="Choose Username" required>
-                    <label for="username">Choose Username</label>
+                {% if not success %}
+                <div class="glass-panel">
+                    <form method="post" id="signupForm">
+                        <div class="row g-5">
+                            <div class="col-lg-6">
+                                <span class="section-label">Your Profile</span>
+                                <div class="mb-4">
+                                    <label class="fw-bold small mb-2 opacity-50">Full Name</label>
+                                    <input type="text" name="fullname" class="input-pro" placeholder="John Doe" required>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="fw-bold small mb-2 opacity-50">Registration Number / ID</label>
+                                    <input type="text" name="userid" class="input-pro" placeholder="STU-2025-001" required>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="fw-bold small mb-2 opacity-50">Username</label>
+                                    <input type="text" name="username" class="input-pro" placeholder="john.doe" required>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="fw-bold small mb-2 opacity-50">Password</label>
+                                    <input type="password" name="password" class="input-pro" placeholder="••••••••" required>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="fw-bold small mb-2 opacity-50">Email Address</label>
+                                    <input type="email" name="email" class="input-pro" placeholder="email@example.com" required>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="fw-bold small mb-2 opacity-50">Phone Number</label>
+                                    <input type="tel" name="phone" class="input-pro" placeholder="+91 XXXXX XXXXX" required>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6">
+                                <span class="section-label">Face Biometrics</span>
+                                <div class="video-box mb-4 shadow-lg">
+                                    <video id="videoFeed" autoplay playsinline></video>
+                                </div>
+                                <button type="button" id="captureBtn" class="btn btn-outline-pro w-100 rounded-pill py-3 fw-bold mb-4">Capture My Face</button>
+                                <div id="previewBox" style="display:none;" class="text-center">
+                                    <img id="previewImage" src="" class="rounded-4 shadow-sm mb-3" style="width:120px; height:120px; object-fit:cover; border:2px solid var(--on-surface);">
+                                    <p class="small fw-bold text-success"><i class="fas fa-check-circle me-1"></i> Face Captured Successfully</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <input type="hidden" name="image" id="imageData">
+                        <div class="mt-5 pt-4 border-top text-end">
+                            <button type="submit" class="btn btn-custom px-5">Submit for Approval</button>
+                        </div>
+                    </form>
                 </div>
+                {% endif %}
             </div>
-
-            <div class="input-group mb-3">
-                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-                <div class="form-floating">
-                    <input type="email" class="form-control" id="email" name="email" placeholder="Email Address" required>
-                    <label for="email">Email Address</label>
-                </div>
-            </div>
-
-            <div class="input-group mb-3">
-                <span class="input-group-text"><i class="fas fa-phone"></i></span>
-                <div class="form-floating">
-                    <input type="tel" class="form-control" id="phone" name="phone" placeholder="Phone Number" required>
-                    <label for="phone">Phone Number</label>
-                </div>
-            </div>
-
-            <div class="input-group mb-4">
-                <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                <div class="form-floating">
-                    <input type="password" class="form-control" id="password" name="password" placeholder="Create Password" required>
-                    <label for="password">Create Password</label>
-                </div>
-            </div>
-
-            <button type="submit" class="btn btn-signup w-100">
-                <i class="fas fa-user-plus me-2"></i>Sign Up
-            </button>
-        </form>
-        
-        <div class="toggle-link">
-            <i class="fas fa-sign-in-alt me-1"></i>Already have an account? <a href="/login">Login here</a>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <canvas id="captureCanvas" style="display:none;"></canvas>
+
     <script>
-      AOS.init({
-          easing: 'ease',
-          duration: 800,
-          once: true
-      });
+        function toggleTheme() {
+            const body = document.body;
+            const next = body.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+            body.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            document.getElementById('theme-icon').className = next === 'light' ? 'fas fa-moon' : 'fas fa-sun';
+        }
+
+        const video = document.getElementById('videoFeed');
+        const canvas = document.getElementById('captureCanvas');
+        const captureBtn = document.getElementById('captureBtn');
+
+        if (video) {
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => video.srcObject = stream)
+                .catch(err => {
+                    console.error("Camera error:", err);
+                    alert("Unable to access camera. Please ensure you've given permission.");
+                });
+        }
+
+        if (captureBtn) {
+            captureBtn.addEventListener('click', () => {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                canvas.getContext('2d').drawImage(video, 0, 0);
+                const data = canvas.toDataURL('image/jpeg');
+                document.getElementById('imageData').value = data;
+                document.getElementById('previewImage').src = data;
+                document.getElementById('previewBox').style.display = 'block';
+            });
+        }
     </script>
 </body>
 </html>
