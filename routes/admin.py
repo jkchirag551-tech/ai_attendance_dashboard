@@ -502,8 +502,14 @@ def test_all_notifications():
     
     # 2. Send Push Notification to self
     user = User.query.get(session.get('user_id'))
+    debug_info = ""
     pushed = False
-    if user and user.fcm_token:
+    
+    if not user:
+        debug_info = "User not found in session."
+    elif not user.fcm_token:
+        debug_info = f"No FCM token found for {user.username}. Please log in via the mobile app first."
+    else:
         try:
             send_push_notification(
                 user.fcm_token,
@@ -511,12 +517,15 @@ def test_all_notifications():
                 "Your mobile notification bridge is working perfectly!"
             )
             pushed = True
-        except:
-            pass
+            debug_info = f"Sent to token: {user.fcm_token[:10]}..."
+        except Exception as e:
+            debug_info = f"FCM Error: {str(e)}"
             
     return jsonify({
         'status': 'success', 
-        'message': 'Dashboard feed updated' + (' and Push sent!' if pushed else ' (No mobile token found)')
+        'message': 'Dashboard feed updated',
+        'pushed': pushed,
+        'debug': debug_info
     })
 
 
