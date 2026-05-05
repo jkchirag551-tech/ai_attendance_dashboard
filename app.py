@@ -292,6 +292,10 @@ def create_app():
         semester_start = get_setting_value('semester_start_date')
         semester_end = get_setting_value('semester_end_date')
         working_days = get_working_days()
+        
+        # Fetch all calendar events (holidays and special working days)
+        calendar_events = {e.date: e.type for e in CalendarEvent.query.all()}
+        
         total_working_days = 0
         if semester_start and semester_end:
             try:
@@ -299,8 +303,20 @@ def create_app():
                 end_date = datetime.strptime(semester_end, '%Y-%m-%d').date()
                 curr = start_date
                 while curr <= end_date:
-                    if curr.weekday() in working_days:
+                    date_str = curr.strftime('%Y-%m-%d')
+                    is_standard_working = curr.weekday() in working_days
+                    event_type = calendar_events.get(date_str)
+                    
+                    if event_type == 'holiday':
+                        # It's a holiday, don't count it
+                        pass
+                    elif event_type == 'working':
+                        # It's a special working day, always count it
                         total_working_days += 1
+                    elif is_standard_working:
+                        # No special event, follow standard schedule
+                        total_working_days += 1
+
                     curr += timedelta(days=1)
             except:
                 pass
