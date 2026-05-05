@@ -261,14 +261,20 @@
             <div class="alert-error"><i class="fas fa-exclamation-triangle me-2"></i>{{ error }}</div>
         {% endif %}
 
-        <form action="/login" method="POST">
-            <label class="label-pro">Select Role</label>
-            <select name="role" class="input-pro" required>
-                <option value="" disabled hidden>Select Role</option>
-                <option value="student" {% if selected_role == 'student' or not selected_role %}selected{% endif %}>Student</option>
-                <option value="teacher" {% if selected_role == 'teacher' %}selected{% endif %}>Faculty</option>
-                <option value="admin" {% if selected_role == 'admin' %}selected{% endif %}>Administrator</option>
-            </select>
+        <form action="{% if is_admin_portal %}/admin-portal{% else %}/login{% endif %}" method="POST">
+            {% if is_admin_portal %}
+                <input type="hidden" name="role" value="admin">
+                <div class="mb-4 text-center">
+                    <span class="status-badge" style="background: #ef4444; color: white;">System Admin Restricted Access</span>
+                </div>
+            {% else %}
+                <label class="label-pro">Select Role</label>
+                <select name="role" class="input-pro" required>
+                    <option value="" disabled hidden>Select Role</option>
+                    <option value="student" {% if selected_role == 'student' or not selected_role %}selected{% endif %}>Student</option>
+                    <option value="teacher" {% if selected_role == 'teacher' %}selected{% endif %}>Faculty</option>
+                </select>
+            {% endif %}
 
             <label class="label-pro">Account Identifier</label>
             <input type="text" name="username" class="input-pro" placeholder="Unique ID or Username" value="{{ entered_username or '' }}" required>
@@ -283,7 +289,11 @@
         </form>
 
         <div class="mt-4 text-center">
-            <p class="small opacity-75">New student? <a href="/signup" class="fw-bold text-decoration-none" style="color: var(--on-surface);">Register here</a></p>
+            {% if not is_admin_portal %}
+                <p class="small opacity-75">New student? <a href="/signup" class="fw-bold text-decoration-none" style="color: var(--on-surface);">Register here</a></p>
+            {% else %}
+                <p class="small opacity-75"><a href="/login" class="fw-bold text-decoration-none" style="color: var(--on-surface);">Return to Public Login</a></p>
+            {% endif %}
         </div>
     </div>
 
