@@ -1,6 +1,7 @@
 import os
 import uuid
 import json
+import base64
 from datetime import date, datetime, timedelta
 
 import cv2
@@ -134,6 +135,79 @@ def create_app():
 
     # --- PRO API ROUTES ---
     
+    @app_instance.route('/api/signup', methods=['POST'])
+    def api_signup():
+        # Handle JSON or Multipart data
+        if request.is_json:
+            data = request.get_json()
+            image_data = data.get('image') # Base64
+        else:
+            data = request.form
+            image_data = data.get('image')
+
+        fullname = data.get('fullname')
+        userid = data.get('userid')
+        username = data.get('username')
+        password = data.get('password')
+        email = data.get('email')
+        phone = data.get('phone')
+        fcm_token = data.get('fcm_token')
+
+        if not fullname or not userid or not username or not password or not email or not phone or not image_data:
+            return {"status": "error", "message": "All fields are required."}, 400
+
+        if User.query.filter_by(username=username).first():
+            return {"status": "error", "message": "Username already exists."}, 400
+
+        try:
+            # Process Face Image
+            if ',' in image_data:
+                encoded_data = image_data.split(',')[1]
+            else:
+                encoded_data = image_data
+                
+            nparr = np.frombuffer(base64.b64decode(encoded_data), np.uint8)
+            img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+            
+            if img is None:
+                return {"status": "error", "message": "Failed to decode image."}, 400
+                
+            rgb_img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            face_locations = face_recognition.face_locations(rgb_img)
+            unknown_encodings = face_recognition.face_encodings(rgb_img, face_locations)
+
+            if len(unknown_encodings) != 1:
+                return {"status": "error", "message": "Please provide exactly one clear face image."}, 400
+                
+            candidate_encoding = unknown_encodings[0]
+            
+            # Check if face already registered
+            existing_users = User.query.filter(User.face_encoding.isnot(None)).all()
+            for existing_user in existing_users:
+                existing_encoding = np.array(json.loads(existing_user.face_encoding))
+                if face_recognition.compare_faces([existing_encoding], candidate_encoding, tolerance=0.45)[0]:
+                    return {"status": "error", "message": "This face is already registered to another account."}, 400
+            
+            face_encoding_json = json.dumps(candidate_encoding.tolist())
+            new_user = User(
+                role='student',
+                fullname=fullname,
+                userid=userid,
+                username=username,
+                password=generate_password_hash(password),
+                email=email,
+                phone=phone,
+                face_encoding=face_encoding_json,
+                fcm_token=fcm_token,
+                is_approved=False
+            )
+            db.session.add(new_user)
+            db.session.commit()
+            return {"status": "success", "message": "Signup successful! Waiting for admin approval."}, 201
+        except Exception as e:
+            db.session.rollback()
+            return {"status": "error", "message": str(e)}, 500
+
     @app_instance.route('/api/user/fcm_token', methods=['POST'])
     def api_save_fcm_token():
         data = request.get_json() or {}

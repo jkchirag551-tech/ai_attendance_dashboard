@@ -12,9 +12,14 @@ def send_push_notification(token, title, body):
             notification=messaging.AndroidNotification(
                 channel_id='high_importance_channel',
                 priority='high',
-                icon='ic_launcher'
+                icon='ic_launcher',
+                click_action='FLUTTER_NOTIFICATION_CLICK'
             ),
         ),
+        data={
+            'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+            'type': 'notice'
+        },
         token=token,
     )
     try:

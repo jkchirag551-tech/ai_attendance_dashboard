@@ -469,6 +469,22 @@ def update_working_days():
         return jsonify({'success': False, 'message': str(e)}), 500
 
 
+@admin_bp.route('/test_push/<int:user_id>', methods=['POST'])
+@login_required
+@role_required('admin')
+def test_push(user_id):
+    user = User.query.get_or_404(user_id)
+    if not user.fcm_token:
+        return jsonify({'status': 'error', 'message': f'No notification token found for {user.fullname}. Make sure they have logged into the mobile app at least once.'}), 400
+    
+    send_push_notification(
+        user.fcm_token,
+        "System Test 🟢",
+        f"Hello {user.fullname}, this is a high-priority test message to verify background notifications are working correctly."
+    )
+    return jsonify({'status': 'success', 'message': f'Test notification sent to {user.fullname}.'})
+
+
 @admin_bp.route('/delete_student/<int:student_id>', methods=['POST'])
 @login_required
 @role_required('admin')

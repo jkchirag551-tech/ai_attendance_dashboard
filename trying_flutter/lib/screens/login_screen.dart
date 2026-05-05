@@ -7,6 +7,7 @@ import '../widgets/shared_widgets.dart';
 import '../widgets/video_background.dart';
 import '../services/notification_service.dart';
 import 'welcome_screen.dart';
+import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -355,6 +356,17 @@ class _LoginCard extends StatelessWidget {
                     : const Icon(Icons.login_rounded), 
                   label: Text(isLoading ? 'Authenticating...' : 'Sign In', style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16))
                 )
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('New student?', style: TextStyle(color: onSurface.withValues(alpha: 0.6), fontWeight: FontWeight.w600)),
+                  TextButton(
+                    onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const RegisterScreen())),
+                    child: Text('Register Identity', style: TextStyle(color: onSurface, fontWeight: FontWeight.w900)),
+                  ),
+                ],
               ),
             ],
           ),

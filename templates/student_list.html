@@ -251,6 +251,7 @@
                             <td><span class="badge rounded-pill bg-dark">{{ student.attendance_percentage }}%</span></td>
                             <td>
                                 <div class="d-flex gap-2">
+                                    <button class="btn btn-info btn-sm text-white" onclick="testPush({{ student.id }}, '{{ student.fullname|escape }}')" title="Test Push Notification"><i class="fas fa-paper-plane"></i></button>
                                     <button class="btn btn-custom btn-sm" onclick="openExportModal({{ student.id }}, '{{ student.fullname|escape }}', 'admin')"><i class="fas fa-download"></i></button>
                                     <button class="btn btn-warning btn-sm" onclick="openResetPasswordModal({{ student.id }}, '{{ student.fullname|escape }}')"><i class="fas fa-key"></i></button>
                                     <button class="btn btn-danger btn-sm" onclick="deleteStudent({{ student.id }}, '{{ student.fullname }}')"><i class="fas fa-trash"></i></button>
@@ -432,6 +433,15 @@
             .then(r => r.json()).then(data => {
                 alert(data.message);
                 if (data.status === 'success') window.location.reload();
+            });
+        }
+
+        function testPush(id, name) {
+            fetch(`{{ url_for('admin.test_push', user_id=0) }}`.replace('0', id), { method: 'POST' })
+            .then(r => r.json()).then(data => {
+                alert(data.message);
+            }).catch(err => {
+                alert('Error sending test push: ' + err.message);
             });
         }
     </script>

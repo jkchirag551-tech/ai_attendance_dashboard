@@ -19,6 +19,37 @@ class AttendanceApiService {
     }
   }
 
+  Future<void> signup({
+    required String fullname,
+    required String userid,
+    required String username,
+    required String password,
+    required String email,
+    required String phone,
+    required String base64Image,
+    String? fcmToken,
+  }) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/api/signup'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'fullname': fullname,
+        'userid': userid,
+        'username': username,
+        'password': password,
+        'email': email,
+        'phone': phone,
+        'image': base64Image,
+        'fcm_token': fcmToken,
+      }),
+    );
+
+    final body = jsonDecode(response.body) as Map<String, dynamic>;
+    if (response.statusCode != 201) {
+      throw AttendanceApiException(body['message'] ?? 'Signup failed.');
+    }
+  }
+
   Future<void> sendTestNotification(String token) async {
     final response = await http.post(
       Uri.parse('$baseUrl/api/admin/test_notification'),
