@@ -308,6 +308,8 @@ def create_app():
             "total_days_present": len(set([l.date for l in all_logs])),
             "total_working_days": total_working_days or 20,
             "attendance_percentage": calculate_attendance_percentage(user.id) if user else 0,
+            "semester_start": semester_start or '2026-01-01',
+            "semester_end": get_setting_value('semester_end_date') or '2026-06-30',
             "history": [{"date": l.date, "time": l.time, "status": l.status} for l in recent_logs],
             "heatmap": {l.date: 1 for l in all_logs}
         }, 200

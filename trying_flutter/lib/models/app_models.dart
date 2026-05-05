@@ -145,6 +145,8 @@ class StudentDashboardData {
     required this.totalDaysPresent,
     required this.totalWorkingDays,
     required this.attendancePercentage,
+    required this.semesterStart,
+    required this.semesterEnd,
     required this.history,
     required this.heatmap,
   });
@@ -152,6 +154,8 @@ class StudentDashboardData {
   final int totalDaysPresent;
   final int totalWorkingDays;
   final double attendancePercentage;
+  final String semesterStart;
+  final String semesterEnd;
   final List<StudentHistoryLog> history;
   final Map<DateTime, int> heatmap;
 
@@ -160,6 +164,8 @@ class StudentDashboardData {
       totalDaysPresent: 0,
       totalWorkingDays: 0,
       attendancePercentage: 0.0,
+      semesterStart: '',
+      semesterEnd: '',
       history: [],
       heatmap: {},
     );
@@ -180,6 +186,8 @@ class StudentDashboardData {
       totalDaysPresent: _asInt(json['total_days_present']),
       totalWorkingDays: _asInt(json['total_working_days']),
       attendancePercentage: (json['attendance_percentage'] as num?)?.toDouble() ?? 0.0,
+      semesterStart: json['semester_start']?.toString() ?? '',
+      semesterEnd: json['semester_end']?.toString() ?? '',
       history: rawHistory
           .map((item) => StudentHistoryLog.fromJson(item as Map<String, dynamic>))
           .toList(growable: false),

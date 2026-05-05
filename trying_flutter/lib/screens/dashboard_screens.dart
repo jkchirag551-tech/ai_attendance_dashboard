@@ -582,10 +582,11 @@ class _StudentDashboardState extends State<StudentDashboard> {
                           ],
                         ),
                         const SizedBox(height: 32),
-                        const SectionLabel('Intelligence Feed'),
+                        const SectionLabel('Academic Period'),
                         const SizedBox(height: 16),
-                        ConsistencyMatrix(
-                          datasets: data.heatmap,
+                        _AcademicPeriodCard(
+                          startDate: data.semesterStart,
+                          endDate: data.semesterEnd,
                         ),
                         const SizedBox(height: 32),
                         const SectionLabel('Activity History'),
@@ -610,6 +611,104 @@ class _StudentDashboardState extends State<StudentDashboard> {
                 ],
               ),
             ),
+    );
+  }
+}
+
+class _AcademicPeriodCard extends StatelessWidget {
+  const _AcademicPeriodCard({required this.startDate, required this.endDate});
+  final String startDate;
+  final String endDate;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final onSurface = theme.colorScheme.onSurface;
+
+    return GlassPanel(
+      padding: const EdgeInsets.all(24),
+      borderRadius: 24,
+      child: Row(
+        children: [
+          Expanded(
+            child: _DateColumn(
+              label: 'COMMENCEMENT',
+              date: startDate,
+              icon: Icons.calendar_today_rounded,
+            ),
+          ),
+          Container(
+            height: 40,
+            width: 1,
+            color: onSurface.withValues(alpha: 0.1),
+          ),
+          Expanded(
+            child: _DateColumn(
+              label: 'CONCLUSION',
+              date: endDate,
+              icon: Icons.event_available_rounded,
+              crossAxisAlignment: CrossAxisAlignment.end,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DateColumn extends StatelessWidget {
+  const _DateColumn({
+    required this.label,
+    required this.date,
+    required this.icon,
+    this.crossAxisAlignment = CrossAxisAlignment.start,
+  });
+
+  final String label;
+  final String date;
+  final IconData icon;
+  final CrossAxisAlignment crossAxisAlignment;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final onSurface = theme.colorScheme.onSurface;
+
+    return Column(
+      crossAxisAlignment: crossAxisAlignment,
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (crossAxisAlignment == CrossAxisAlignment.start) ...[
+              Icon(icon, size: 14, color: onSurface.withValues(alpha: 0.5)),
+              const SizedBox(width: 6),
+            ],
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w800,
+                color: onSurface.withValues(alpha: 0.4),
+                letterSpacing: 1,
+              ),
+            ),
+            if (crossAxisAlignment == CrossAxisAlignment.end) ...[
+              const SizedBox(width: 6),
+              Icon(icon, size: 14, color: onSurface.withValues(alpha: 0.5)),
+            ],
+          ],
+        ),
+        const SizedBox(height: 8),
+        Text(
+          date.isEmpty ? '---' : date,
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w900,
+            color: onSurface,
+          ),
+        ),
+      ],
     );
   }
 }
