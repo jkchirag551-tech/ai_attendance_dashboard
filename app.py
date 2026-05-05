@@ -288,16 +288,17 @@ def create_app():
         # Get history sorted by ID descending to show newest first
         recent_logs = Attendance.query.filter_by(username=username).order_by(Attendance.id.desc()).limit(15).all()
 
-        # Calculate total working days in current period
-        today_date = date.today()
+        # Calculate total working days in entire semester period
         semester_start = get_setting_value('semester_start_date')
+        semester_end = get_setting_value('semester_end_date')
         working_days = get_working_days()
         total_working_days = 0
-        if semester_start:
+        if semester_start and semester_end:
             try:
                 start_date = datetime.strptime(semester_start, '%Y-%m-%d').date()
+                end_date = datetime.strptime(semester_end, '%Y-%m-%d').date()
                 curr = start_date
-                while curr <= today_date:
+                while curr <= end_date:
                     if curr.weekday() in working_days:
                         total_working_days += 1
                     curr += timedelta(days=1)
