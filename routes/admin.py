@@ -9,6 +9,7 @@ from sqlalchemy import or_
 from werkzeug.security import generate_password_hash
 from models import Attendance, User, db, Settings, Notice
 from utils import login_required, role_required
+from notification_utils import send_push_notification
 from export_utils import build_attendance_excel, build_attendance_pdf
 
 admin_bp = Blueprint('admin', __name__)
@@ -345,6 +346,14 @@ def approve_student(user_id):
     user = User.query.get_or_404(user_id)
     user.is_approved = True
     db.session.commit()
+    
+    if user.fcm_token:
+        send_push_notification(
+            user.fcm_token,
+            "Account Approved! 🎊",
+            "Welcome to MR. Attendance. Your registration has been approved by the administrator. You can now access your dashboard."
+        )
+
     return jsonify({'status': 'success', 'message': f'Student {user.fullname} approved successfully.'})
 
 
@@ -433,9 +442,16 @@ def update_working_days():
         # Broadcast logic
         broadcast_email = request.form.get('broadcast_email') == '1'
         broadcast_sms = request.form.get('broadcast_sms') == '1'
-        if (broadcast_email or broadcast_sms) and class_update_message:
+        broadcast_push = request.form.get('broadcast_push') == '1'
+        if (broadcast_email or broadcast_sms or broadcast_push) and class_update_message:
             recipients = User.query.filter(User.role.in_(['student', 'teacher'])).all()
             for user in recipients:
+                if broadcast_push and user.fcm_token:
+                    send_push_notification(
+                        user.fcm_token,
+                        "Schedule Update 📅",
+                        class_update_message
+                    )
                 if broadcast_email and user.email:
                     print(f"DEBUG: Sending Email to {user.email}: {class_update_message}")
                 if broadcast_sms and user.phone:
@@ -626,8 +642,108 @@ def create_notice():
         
         db.session.add(notice)
         db.session.commit()
+
+        # Send push notifications
+        title = f"New Notice from Admin: {category}"
         
-        return jsonify({'status': 'success', 'message': 'Notice created successfully!'})
+        target_roles = []
+        if audience == 'all':
+            target_roles = ['student', 'teacher']
+        elif audience == 'students' or audience == 'student':
+            target_roles = ['student']
+        elif audience == 'teachers' or audience == 'teacher':
+            target_roles = ['teacher']
+
+        recipients = User.query.filter(User.role.in_(target_roles), User.fcm_token.isnot(None)).all()
+        for recipient in recipients:
+            send_push_notification(
+                recipient.fcm_token,
+                title,
+                content
+            )
+        
+        return jsonify({'status': 'success', 'message': 'Notice created successfully and notifications sent!'})
     except Exception as e:
         db.session.rollback()
         return jsonify({'status': 'error', 'message': f'Failed to create notice: {str(e)}'}), 500
+
+
+@admin_bp.route('/all_results')
+@login_required
+@role_required('admin')
+def all_results():
+    search_name = (request.args.get('search') or '').strip()
+    records_query = Attendance.query.outerjoin(User, Attendance.user_id == User.id)
+
+    if search_name:
+        search_pattern = f'%{search_name}%'
+        records_query = records_query.filter(
+            or_(
+                User.fullname.ilike(search_pattern),
+                User.username.ilike(search_pattern),
+                Attendance.username.ilike(search_pattern),
+            )
+        )
+
+    records = records_query.order_by(Attendance.date.desc(), Attendance.time.desc()).all()
+    return render_template('all_results.html', records=records, search_name=search_name)
+
+
+@admin_bp.route('/generate_dummy_data', methods=['POST'])
+@login_required
+@role_required('admin')
+def generate_dummy_data():
+    try:
+        # 10 Dummy Students
+        students_data = [
+            ("Aarav Sharma", "STU101", "aarav101"),
+            ("Vihaan Gupta", "STU102", "vihaan102"),
+            ("Aditi Verma", "STU103", "aditi103"),
+            ("Ananya Iyer", "STU104", "ananya104"),
+            ("Ishaan Malhotra", "STU105", "ishaan105"),
+            ("Saanvi Reddy", "STU106", "saanvi106"),
+            ("Arjun Nair", "STU107", "arjun107"),
+            ("Kyra Kapoor", "STU108", "kyra108"),
+            ("Rohan Joshi", "STU109", "rohan109"),
+            ("Myra Singh", "STU110", "myra110"),
+        ]
+
+        for fullname, userid, username in students_data:
+            if not User.query.filter_by(username=username).first():
+                user = User(
+                    role='student',
+                    fullname=fullname,
+                    userid=userid,
+                    username=username,
+                    password=generate_password_hash('Student@123'),
+                    email=f"{username}@example.com",
+                    phone="9876543210",
+                    is_approved=True
+                )
+                db.session.add(user)
+
+        # 2 Dummy Teachers
+        teachers_data = [
+            ("Dr. Rajesh Kumar", "TEA201", "rajesh201"),
+            ("Prof. Sneha Patil", "TEA202", "sneha202"),
+        ]
+
+        for fullname, userid, username in teachers_data:
+            if not User.query.filter_by(username=username).first():
+                user = User(
+                    role='teacher',
+                    fullname=fullname,
+                    userid=userid,
+                    username=username,
+                    password=generate_password_hash('Teacher@123'),
+                    email=f"{username}@example.com",
+                    phone="9123456789",
+                    is_approved=True
+                )
+                db.session.add(user)
+
+        db.session.commit()
+        return jsonify({'status': 'success', 'message': '10 Students and 2 Teachers added successfully!'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'status': 'error', 'message': str(e)}), 500

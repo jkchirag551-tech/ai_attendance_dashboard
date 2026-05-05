@@ -5,6 +5,7 @@ from werkzeug.security import generate_password_hash
 from models import db, User, Settings, Attendance, Notice
 from sqlalchemy import desc, or_
 from utils import login_required, role_required
+from notification_utils import send_push_notification
 from export_utils import build_attendance_excel, build_attendance_pdf
 
 # 1. Create the Blueprint
@@ -294,9 +295,15 @@ def update_class_message():
         set_setting_value('class_update_updated_at', datetime.now().strftime('%Y-%m-%d %I:%M %p'))
 
         # Broadcast logic
-        if (broadcast_email or broadcast_sms) and class_update_message:
+        if (broadcast_email or broadcast_sms or data.get('broadcast_push', True)) and class_update_message:
             recipients = User.query.filter(User.role == 'student').all()
             for user in recipients:
+                if data.get('broadcast_push', True) and user.fcm_token:
+                    send_push_notification(
+                        user.fcm_token,
+                        "Class Update 📢",
+                        class_update_message
+                    )
                 if broadcast_email and user.email:
                     print(f"DEBUG: Sending Email to {user.email}: {class_update_message}")
                 if broadcast_sms and user.phone:
@@ -381,8 +388,18 @@ def create_notice():
         
         db.session.add(notice)
         db.session.commit()
+
+        # Send push notifications to students
+        title = f"Notice from {user.fullname}: {category}"
+        recipients = User.query.filter_by(role='student').filter(User.fcm_token.isnot(None)).all()
+        for recipient in recipients:
+            send_push_notification(
+                recipient.fcm_token,
+                title,
+                content
+            )
         
-        return jsonify({'status': 'success', 'message': 'Notice sent successfully!'})
+        return jsonify({'status': 'success', 'message': 'Notice sent successfully and students notified!'})
     except Exception as e:
         db.session.rollback()
         return jsonify({'status': 'error', 'message': f'Failed to send notice: {str(e)}'}), 500
@@ -403,6 +420,14 @@ def approve_student(user_id):
     user = User.query.get_or_404(user_id)
     user.is_approved = True
     db.session.commit()
+    
+    if user.fcm_token:
+        send_push_notification(
+            user.fcm_token,
+            "Account Approved! 🎊",
+            "Welcome to MR. Attendance. Your registration has been approved by your faculty. You can now access your dashboard."
+        )
+
     return jsonify({'status': 'success', 'message': f'Student {user.fullname} approved successfully.'})
 
 

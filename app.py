@@ -19,6 +19,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from config import Config
 from models import Attendance, db, User, Notice, Settings, CalendarEvent
 from routes.auth import auth_bp
+from notification_utils import send_push_notification
 from routes.admin import admin_bp, calculate_attendance_percentage, get_working_days, get_setting_value
 from routes.student import student_bp
 from routes.face import face_bp
@@ -177,28 +178,6 @@ def create_app():
             return {"status": "success", "message": f"Test email sent to {email}"}, 200
         except Exception as e:
             return {"status": "error", "message": str(e)}, 500
-
-    def send_push_notification(token, title, body):
-        if not token:
-            return
-        message = messaging.Message(
-            notification=messaging.Notification(
-                title=title,
-                body=body,
-            ),
-            android=messaging.AndroidConfig(
-                notification=messaging.AndroidNotification(
-                    channel_id='high_importance_channel',
-                    priority='high',
-                ),
-            ),
-            token=token,
-        )
-        try:
-            response = messaging.send(message)
-            print('Successfully sent message:', response)
-        except Exception as e:
-            print('Error sending push notification:', e)
 
     @app_instance.route('/api/login', methods=['POST'])
     def api_login():

@@ -156,12 +156,23 @@
     </video>
     <nav class="navbar navbar-expand-lg top-bar fixed-top">
         <div class="container-fluid">
-            <a class="navbar-brand" href="/">
+            <a class="navbar-brand" href="{{ url_for('admin.admin_dashboard') }}">
                 <div class="brand-logo-container">
                     <img src="{{ url_for('static', filename='images/logo.png', v='1.1') }}" alt="Logo" style="width:100%; height:100%; object-fit:contain;">
                 </div>
                 <span>MR. Attendance</span>
             </a>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.welcome') }}">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.admin_dashboard') }}">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.all_results') }}">Results</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.student_list') }}">Users</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="{{ url_for('admin.academic_calendar') }}">Calendar</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.settings') }}">Settings</a></li>
+                    <li class="nav-item ms-3"><a class="btn btn-danger rounded-pill px-4 fw-bold" href="{{ url_for('auth.logout') }}">Logout</a></li>
+                </ul>
+            </div>
         </div>
     </nav>
 

@@ -204,6 +204,14 @@
             <div class="col-lg-6">
                 <h1 class="display-4" style="font-weight: 900; letter-spacing: -2px;">Directories</h1>
                 <span class="section-label">Management Command Center</span>
+                <div class="d-flex gap-2 mt-3">
+                    <a href="{{ url_for('admin.all_results') }}" class="btn btn-enter rounded-pill px-4 fw-bold bg-dark text-white shadow-sm">
+                        <i class="fas fa-list-ul me-2"></i>View All Results
+                    </a>
+                    <button onclick="generateDummyData()" class="btn btn-outline-dark rounded-pill px-4 fw-bold shadow-sm">
+                        <i class="fas fa-magic me-2"></i>Add Dummy Data
+                    </button>
+                </div>
             </div>
             <div class="col-lg-6">
                 <form method="get" class="d-flex gap-3 justify-content-lg-end">
@@ -412,6 +420,15 @@
         function deleteStudent(id, name) {
             if (!confirm(`Permanently delete ${name}?`)) return;
             fetch(`{{ url_for('admin.delete_student', student_id=0) }}`.replace('0', id), { method: 'POST' })
+            .then(r => r.json()).then(data => {
+                alert(data.message);
+                if (data.status === 'success') window.location.reload();
+            });
+        }
+
+        function generateDummyData() {
+            if (!confirm("Add 10 students and 2 teachers for testing?")) return;
+            fetch("{{ url_for('admin.generate_dummy_data') }}", { method: 'POST' })
             .then(r => r.json()).then(data => {
                 alert(data.message);
                 if (data.status === 'success') window.location.reload();
