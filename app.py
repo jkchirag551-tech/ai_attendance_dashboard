@@ -161,32 +161,46 @@ def create_app():
 
         try:
             # Process Face Image
+            if not image_data:
+                return {"status": "error", "message": "Face image data is missing."}, 400
+
             if ',' in image_data:
                 encoded_data = image_data.split(',')[1]
             else:
                 encoded_data = image_data
-                
-            nparr = np.frombuffer(base64.b64decode(encoded_data), np.uint8)
-            img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+            
+            try:
+                decoded_bytes = base64.b64decode(encoded_data)
+                nparr = np.frombuffer(decoded_bytes, np.uint8)
+                img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+            except Exception as decode_err:
+                return {"status": "error", "message": f"Image decoding failed: {str(decode_err)}"}, 400
             
             if img is None:
-                return {"status": "error", "message": "Failed to decode image."}, 400
+                return {"status": "error", "message": "Failed to decode image into a valid format."}, 400
                 
             rgb_img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             face_locations = face_recognition.face_locations(rgb_img)
+            
+            if not face_locations:
+                return {"status": "error", "message": "No face detected in the captured photo. Please try again in a well-lit area."}, 400
+
             unknown_encodings = face_recognition.face_encodings(rgb_img, face_locations)
 
             if len(unknown_encodings) != 1:
-                return {"status": "error", "message": "Please provide exactly one clear face image."}, 400
+                return {"status": "error", "message": f"Expected 1 face, but found {len(unknown_encodings)}. Please capture only your face."}, 400
                 
             candidate_encoding = unknown_encodings[0]
             
             # Check if face already registered
             existing_users = User.query.filter(User.face_encoding.isnot(None)).all()
             for existing_user in existing_users:
-                existing_encoding = np.array(json.loads(existing_user.face_encoding))
-                if face_recognition.compare_faces([existing_encoding], candidate_encoding, tolerance=0.45)[0]:
-                    return {"status": "error", "message": "This face is already registered to another account."}, 400
+                try:
+                    existing_encoding = np.array(json.loads(existing_user.face_encoding))
+                    if face_recognition.compare_faces([existing_encoding], candidate_encoding, tolerance=0.45)[0]:
+                        return {"status": "error", "message": f"This face is already registered to account: {existing_user.username}"}, 400
+                except:
+                    continue
             
             face_encoding_json = json.dumps(candidate_encoding.tolist())
             new_user = User(
@@ -203,10 +217,11 @@ def create_app():
             )
             db.session.add(new_user)
             db.session.commit()
-            return {"status": "success", "message": "Signup successful! Waiting for admin approval."}, 201
+            return {"status": "success", "message": "Signup successful! Your account is now pending admin approval."}, 201
         except Exception as e:
             db.session.rollback()
-            return {"status": "error", "message": str(e)}, 500
+            print(f"DEBUG SIGNUP ERROR: {str(e)}")
+            return {"status": "error", "message": f"Server Error: {str(e)}"}, 500
 
     @app_instance.route('/api/user/fcm_token', methods=['POST'])
     def api_save_fcm_token():

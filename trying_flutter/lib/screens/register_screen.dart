@@ -49,22 +49,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Future<void> _initCamera() async {
-    if (cameras.isEmpty) return;
-
-    CameraDescription selectedCamera = cameras[0];
-    for (var camera in cameras) {
-      if (camera.lensDirection == CameraLensDirection.front) {
-        selectedCamera = camera;
-        break;
-      }
-    }
-
-    _cameraController = CameraController(selectedCamera, ResolutionPreset.medium, enableAudio: false);
     try {
+      if (cameras.isEmpty) {
+        cameras = await availableCameras();
+      }
+
+      if (cameras.isEmpty) {
+        setState(() => _errorMessage = 'No cameras detected on this device.');
+        return;
+      }
+
+      CameraDescription selectedCamera = cameras[0];
+      for (var camera in cameras) {
+        if (camera.lensDirection == CameraLensDirection.front) {
+          selectedCamera = camera;
+          break;
+        }
+      }
+
+      _cameraController = CameraController(selectedCamera, ResolutionPreset.medium, enableAudio: false);
       await _cameraController!.initialize();
       if (mounted) setState(() {});
     } catch (e) {
-      debugPrint('Camera initialization failed: $e');
+      if (mounted) setState(() => _errorMessage = 'Camera Permission Error: $e');
     }
   }
 
