@@ -320,10 +320,10 @@ class _CinematicLoadingOverlayState extends State<_CinematicLoadingOverlay> with
                   );
                 },
                 child: Container(
-                  width: 80,
-                  height: 80,
+                  width: 64,
+                  height: 64,
                   decoration: const BoxDecoration(color: Colors.transparent, shape: BoxShape.circle),
-                  child: Image.asset('assets/images/logo.png', width: 70, height: 70, fit: BoxFit.contain),
+                  child: Image.asset('assets/images/logo.png', width: 56, height: 56, fit: BoxFit.contain),
                 ),
               ),
               const SizedBox(height: 24),
@@ -815,19 +815,17 @@ class DashboardShell extends StatelessWidget {
                         color: surface,
                         onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const FaceScanScreen())),
                       ),
-                    if (currentRoute != 'student')
+                    if (currentRoute == 'teacher')
                       _BottomNavIcon(
                         icon: Icons.dashboard_rounded,
                         label: 'Command',
                         active: currentRoute == 'dashboard',
                         color: surface,
                         onTap: () {
-                          if (currentRoute != 'dashboard') {
-                            Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => AdminDashboard(username: username)));
-                          }
+                          // No-op or handle appropriately if needed
                         },
                       ),
-                    if (currentRoute != 'student')
+                    if (currentRoute == 'teacher')
                       _BottomNavIcon(
                         icon: Icons.class_rounded,
                         label: 'Faculty',
@@ -1047,8 +1045,8 @@ class _Sidebar extends StatelessWidget {
             children: [
               Image.asset(
                 'assets/images/logo.png',
-                width: 38,
-                height: 38,
+                width: 32,
+                height: 32,
                 fit: BoxFit.contain,
                 errorBuilder: (_, __, ___) => const Icon(Icons.blur_on_rounded, color: Colors.white, size: 24),
               ),
@@ -1057,16 +1055,6 @@ class _Sidebar extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 40),
-          _NavTile(
-            icon: Icons.dashboard_rounded,
-            label: 'Command Center',
-            active: currentRoute == 'dashboard',
-            onTap: () {
-              if (currentRoute != 'dashboard') {
-                Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => AdminDashboard(username: username)));
-              }
-            },
-          ),
           _NavTile(
             icon: Icons.class_rounded,
             label: 'Faculty Workspace',
@@ -1090,20 +1078,20 @@ class _Sidebar extends StatelessWidget {
           const SizedBox(height: 16),
           const SectionLabel('Management'),
           const SizedBox(height: 8),
-          if (currentRoute == 'dashboard' || currentRoute == 'teacher') ...[
+          if (currentRoute == 'teacher') ...[
             _NavTile(
               icon: Icons.person_add_rounded,
               label: 'Enroll User',
               active: false,
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => AdminRegisterScreen(fixedRole: currentRoute == 'teacher' ? 'student' : null))),
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => AdminRegisterScreen(fixedRole: 'student'))),
             ),
             _NavTile(
               icon: Icons.people_alt_rounded,
               label: 'Identity Registry',
               active: false,
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => UserListScreen(
-                title: currentRoute == 'teacher' ? 'Students' : 'User Management',
-                filterRole: currentRoute == 'teacher' ? 'student' : null,
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const UserListScreen(
+                title: 'Students',
+                filterRole: 'student',
               ))),
             ),
           ],
@@ -1113,41 +1101,27 @@ class _Sidebar extends StatelessWidget {
             active: false,
             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const NoticeScreen())),
           ),
-          if (currentRoute == 'dashboard')
-            _NavTile(
-              icon: Icons.calendar_view_month_rounded,
-              label: 'Attendance Intelligence',
-              active: false,
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MonthlyAttendanceScreen())),
-            ),
           _NavTile(
             icon: Icons.calendar_month_rounded,
             label: 'Academic Calendar',
             active: false,
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => AcademicCalendarScreen(isAdmin: currentRoute == 'dashboard'))),
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AcademicCalendarScreen(isAdmin: false))),
           ),
           _NavTile(
             icon: Icons.account_circle_rounded,
             label: 'My Profile',
             active: false,
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ProfileScreen(username: username, role: currentRoute == 'dashboard' ? 'admin' : (currentRoute == 'teacher' ? 'teacher' : 'student')))),
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ProfileScreen(username: username, role: currentRoute == 'teacher' ? 'teacher' : 'student'))),
           ),
-          if (currentRoute == 'dashboard' || currentRoute == 'teacher') ...[
+          if (currentRoute == 'teacher') ...[
             const SizedBox(height: 12),
             _NavTile(
               icon: Icons.add_comment_outlined,
               label: 'Broadcast Notice',
               active: false,
-              onTap: () => _showPostNotice(context, username, currentRoute == 'dashboard' ? 'admin' : 'teacher'),
+              onTap: () => _showPostNotice(context, username, 'teacher'),
             ),
           ],
-          if (currentRoute == 'dashboard')
-            _NavTile(
-              icon: Icons.settings_outlined,
-              label: 'System Settings',
-              active: false,
-              onTap: () => _showAdminSettings(context),
-            ),
           const Spacer(),
           _NavTile(
             icon: Icons.logout_rounded,

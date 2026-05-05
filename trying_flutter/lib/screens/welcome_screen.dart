@@ -24,9 +24,7 @@ class WelcomeScreen extends StatefulWidget {
 class _WelcomeScreenState extends State<WelcomeScreen> {
   void _navigateToDashboard() {
     Widget dashboard;
-    if (widget.role == 'admin') {
-      dashboard = AdminDashboard(username: widget.username);
-    } else if (widget.role == 'teacher') {
+    if (widget.role == 'teacher') {
       dashboard = TeacherDashboard(username: widget.username);
     } else {
       dashboard = StudentDashboard(username: widget.username);
@@ -56,11 +54,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               _MoreMenuItem(icon: Icons.person_outline_rounded, label: 'Account Profile', onTap: () { Navigator.pop(context); Navigator.push(context, MaterialPageRoute(builder: (_) => ProfileScreen(username: widget.username, role: widget.role))); }),
               _MoreMenuItem(icon: appState.isDarkMode ? Icons.light_mode_rounded : Icons.dark_mode_rounded, label: appState.isDarkMode ? 'Appearance: Light' : 'Appearance: Midnight', onTap: () { Navigator.pop(context); appState.toggleTheme(); }),
               _MoreMenuItem(icon: Icons.campaign_outlined, label: 'Official Notices', onTap: () { Navigator.pop(context); Navigator.push(context, MaterialPageRoute(builder: (_) => const NoticeScreen())); }),
-              _MoreMenuItem(icon: Icons.calendar_month_outlined, label: 'Academic Calendar', onTap: () { Navigator.pop(context); Navigator.push(context, MaterialPageRoute(builder: (_) => AcademicCalendarScreen(isAdmin: widget.role == 'admin'))); }),
-              if (widget.role == 'admin') ...[
-                _MoreMenuItem(icon: Icons.settings_outlined, label: 'System Configuration', onTap: () { Navigator.pop(context); _showAdminSettings(); }),
-                _MoreMenuItem(icon: Icons.add_comment_outlined, label: 'Broadcast Notice', onTap: () { Navigator.pop(context); _showPostNotice(); }),
-              ],
+              _MoreMenuItem(icon: Icons.calendar_month_outlined, label: 'Academic Calendar', onTap: () { Navigator.pop(context); Navigator.push(context, MaterialPageRoute(builder: (_) => AcademicCalendarScreen(isAdmin: false))); }),
               if (widget.role == 'teacher') ...[
                 _MoreMenuItem(icon: Icons.add_comment_outlined, label: 'Broadcast Notice', onTap: () { Navigator.pop(context); _showPostNotice(); }),
               ],
@@ -131,10 +125,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                           children: [
                             Image.asset(
                               'assets/images/logo.png',
-                              width: 52,
-                              height: 52,
+                              width: 44,
+                              height: 44,
                               fit: BoxFit.contain,
-                              errorBuilder: (_, __, ___) => const Icon(Icons.blur_on_rounded, size: 36, color: Colors.white)
+                              errorBuilder: (_, __, ___) => const Icon(Icons.blur_on_rounded, size: 30, color: Colors.white)
                             ),
                             const SizedBox(width: 12),
                             Text('Mr. Attendance', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: onSurface, letterSpacing: 0.5)),
@@ -159,14 +153,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   }
 
   List<Widget> _buildNavItems(BuildContext context, String role, Color iconColor) {
-    if (role == 'admin') {
-      return [
-        _WelcomeNavIcon(icon: Icons.person_add_rounded, label: 'Enroll', color: iconColor, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AdminRegisterScreen()))),
-        _WelcomeNavIcon(icon: Icons.people_alt_rounded, label: 'Identity', color: iconColor, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const UserListScreen()))),
-        _WelcomeNavIcon(icon: Icons.history_rounded, label: 'Intelligence', color: iconColor, onTap: _navigateToDashboard),
-        _WelcomeNavIcon(icon: Icons.more_horiz_rounded, label: 'More', color: iconColor, onTap: _showMoreMenu),
-      ];
-    } else if (role == 'teacher') {
+    if (role == 'teacher') {
       return [
         _WelcomeNavIcon(icon: Icons.person_add_rounded, label: 'Enroll', color: iconColor, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AdminRegisterScreen(fixedRole: 'student')))),
         _WelcomeNavIcon(icon: Icons.people_alt_rounded, label: 'Governance', color: iconColor, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const UserListScreen(title: 'Students', filterRole: 'student')))),

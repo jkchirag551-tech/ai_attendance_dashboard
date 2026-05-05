@@ -232,8 +232,8 @@ class _LoginCard extends StatelessWidget {
                 alignment: Alignment.center,
                 children: [
                   Container(
-                    width: 90,
-                    height: 90,
+                    width: 76,
+                    height: 76,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       gradient: RadialGradient(
@@ -245,28 +245,18 @@ class _LoginCard extends StatelessWidget {
                     ),
                   ),
                   Container(
-                    width: 72, height: 72,
+                    width: 60, height: 60,
                     decoration: const BoxDecoration(
                       color: Colors.transparent, 
                       shape: BoxShape.circle, 
                     ),
                     child: Center(
-                      child: GestureDetector(
-                        onLongPress: () {
-                          setState(() {
-                            _selectedRole = 'admin';
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Admin Mode Activated')),
-                            );
-                          });
-                        },
-                        child: Image.asset(
-                          'assets/images/logo.png',
-                          width: 72,
-                          height: 72,
-                          fit: BoxFit.contain,
-                          errorBuilder: (_, __, ___) => Icon(Icons.blur_on_rounded, color: onSurface, size: 26),
-                        ),
+                      child: Image.asset(
+                        'assets/images/logo.png',
+                        width: 60,
+                        height: 60,
+                        fit: BoxFit.contain,
+                        errorBuilder: (_, __, ___) => Icon(Icons.blur_on_rounded, color: onSurface, size: 26),
                       ),
                     ),
                   ),

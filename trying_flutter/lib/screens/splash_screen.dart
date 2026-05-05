@@ -78,8 +78,8 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                     children: [
                       // Highlighting light / Glow effect
                       Container(
-                        width: 220,
-                        height: 220,
+                        width: 180,
+                        height: 180,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           gradient: RadialGradient(
@@ -92,8 +92,8 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                         ),
                       ),
                       Container(
-                        width: 160,
-                        height: 160,
+                        width: 130,
+                        height: 130,
                         decoration: BoxDecoration(
                           color: Colors.black,
                           shape: BoxShape.circle,
@@ -108,8 +108,8 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                         child: Center(
                           child: Image.asset(
                             'assets/images/logo.png',
-                            width: 130,
-                            height: 130,
+                            width: 100,
+                            height: 100,
                             fit: BoxFit.contain,
                           ),
                         ),
