@@ -382,10 +382,7 @@
                 <div class="glass-panel p-0 overflow-hidden h-100">
                     <div class="p-4 border-bottom d-flex justify-content-between align-items-center">
                         <h3 class="mb-0" style="font-weight: 800;">Recent Feed</h3>
-                        <div class="d-flex align-items-center gap-3">
-                            <button class="btn btn-sm btn-outline-secondary" onclick="triggerTestNotification()" style="border-radius: 10px; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">Test System</button>
-                            <span class="status-badge" style="background: #10b981; color: white;">Live</span>
-                        </div>
+                        <span class="status-badge" style="background: #10b981; color: white;">Live</span>
                     </div>
                     <div class="table-responsive">
                         <table class="table table-hover mb-0">
@@ -503,19 +500,6 @@
 
       // Real-time
       const socket = io();
-
-      function triggerTestNotification() {
-          fetch("{{ url_for('admin.test_all_notifications') }}", { method: "POST" })
-          .then(res => res.json())
-          .then(data => {
-              if (data.pushed) {
-                  alert("✅ Test successful! Check your phone.");
-              } else {
-                  alert("❌ Notification Failed: " + data.debug);
-              }
-              console.log(data);
-          });
-      }
 
       function sendBroadcast() {
           const content = document.getElementById('notice-content').value;
