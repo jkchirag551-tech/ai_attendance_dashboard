@@ -484,6 +484,41 @@ def test_push(user_id):
     )
     return jsonify({'status': 'success', 'message': f'Test notification sent to {user.fullname}.'})
 
+@admin_bp.route('/test_all_notifications', methods=['POST'])
+@login_required
+@role_required('admin')
+def test_all_notifications():
+    """Triggers both Socket.io (Dashboard) and Push Notification (Mobile)"""
+    from app import socketio
+    
+    # 1. Update Dashboard
+    socketio.emit('new_checkin', {
+        "username": "System Test",
+        "date": datetime.now().strftime('%Y-%m-%d'),
+        "time": datetime.now().strftime('%I:%M %p'),
+        "status": 'Verified',
+        "proof_url": ""
+    })
+    
+    # 2. Send Push Notification to self
+    user = User.query.get(session.get('user_id'))
+    pushed = False
+    if user and user.fcm_token:
+        try:
+            send_push_notification(
+                user.fcm_token,
+                "System Test 🧪",
+                "Your mobile notification bridge is working perfectly!"
+            )
+            pushed = True
+        except:
+            pass
+            
+    return jsonify({
+        'status': 'success', 
+        'message': 'Dashboard feed updated' + (' and Push sent!' if pushed else ' (No mobile token found)')
+    })
+
 
 @admin_bp.route('/delete_student/<int:student_id>', methods=['POST'])
 @login_required
