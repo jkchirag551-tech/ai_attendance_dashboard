@@ -95,14 +95,15 @@
         }
 
         .hero-bg-video {
-            position: absolute;
-            inset: 0;
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
             object-fit: cover;
-            opacity: 0.55;
-            filter: brightness(0.7) saturate(1.1);
+            opacity: 0.6;
             z-index: -2;
+            pointer-events: none;
         }
 
         .hero-overlay {
@@ -256,6 +257,12 @@
     </style>
 </head>
 <body data-theme="light">
+    <video class="hero-bg-video" autoplay loop muted playsinline>
+        <source src="{{ url_for('static', filename='assets/videos/hero%20video.mp4') }}" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    <div class="hero-overlay"></div>
+
     <div class="bg-glow glow-1"></div>
     <div class="bg-glow glow-2"></div>
 
@@ -279,11 +286,6 @@
     </nav>
 
     <main class="hero-container">
-        <video class="hero-bg-video" autoplay loop muted playsinline>
-            <source src="{{ url_for('static', filename='videos/hero-video.mp4') }}" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
-        <div class="hero-overlay"></div>
         <div class="glass-panel">
             <div class="hero-text">
                 <div class="hero-logo">

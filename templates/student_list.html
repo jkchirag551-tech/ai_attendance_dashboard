@@ -145,6 +145,18 @@
             font-weight: 600;
         }
 
+        .hero-bg-video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.1;
+            z-index: -2;
+            pointer-events: none;
+        }
+
         .directory-row.is-hidden { display: none; }
         .section-label {
             font-size: 11px; font-weight: 800; text-transform: uppercase;
@@ -154,6 +166,9 @@
     </style>
 </head>
 <body data-theme="light">
+    <video class="hero-bg-video" autoplay loop muted playsinline>
+        <source src="{{ url_for('static', filename='assets/videos/hero%20video.mp4') }}" type="video/mp4">
+    </video>
     <div class="bg-glow glow-1"></div>
     <div class="bg-glow glow-2"></div>
 

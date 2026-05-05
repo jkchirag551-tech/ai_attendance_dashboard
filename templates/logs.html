@@ -102,6 +102,18 @@
             margin-bottom: 24px;
         }
 
+        .hero-bg-video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.1;
+            z-index: -2;
+            pointer-events: none;
+        }
+
         .table thead th {
             background: transparent; color: var(--text-muted);
             font-size: 11px; font-weight: 800;
@@ -146,6 +158,9 @@
     </style>
 </head>
 <body data-theme="light">
+    <video class="hero-bg-video" autoplay loop muted playsinline>
+        <source src="{{ url_for('static', filename='assets/videos/hero%20video.mp4') }}" type="video/mp4">
+    </video>
     <div class="bg-glow glow-1"></div>
     <div class="bg-glow glow-2"></div>
 
@@ -165,6 +180,7 @@
                     <li class="nav-item"><a class="nav-link active" href="{{ url_for('admin.logs') }}">Logs</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.academic_calendar') }}">Calendar</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.settings') }}">Settings</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout_page') }}">Sign Out</a></li>
                     <li class="nav-item"><div class="theme-toggle" onclick="toggleTheme()"><i class="fas fa-moon" id="theme-icon"></i></div></li>
                 </ul>
             </div>

@@ -314,20 +314,26 @@ def create_app():
 
     @app_instance.route('/api/scan', methods=['POST'])
     def api_process_scan():
-        # 1. Check Working Days and Hours
-        now = datetime.now()
-        today_weekday = now.weekday() # 0=Monday, 6=Sunday
+        # 1. Handle Timezone (Render is UTC, we need IST)
+        # IST is UTC + 5:30
+        utc_now = datetime.utcnow()
+        ist_now = utc_now + timedelta(hours=5, minutes=30)
+        
+        today_weekday = ist_now.weekday() # 0=Monday, 6=Sunday
         working_days = get_working_days()
 
         if today_weekday not in working_days:
-            return {"status": "error", "message": "Portal is closed today. No check-ins allowed on non-working days."}, 403
+            return {"status": "error", "message": f"Portal is closed today ({ist_now.strftime('%A')}). No check-ins allowed on non-working days."}, 403
 
-        current_time_str = now.strftime('%H:%M')
+        current_time_str = ist_now.strftime('%H:%M')
         start_time = get_setting_value('working_day_start_time', '09:00')
         end_time = get_setting_value('working_day_end_time', '17:00')
 
         if current_time_str < start_time or current_time_str > end_time:
-            return {"status": "error", "message": f"Outside working hours. Check-in allowed only between {start_time} and {end_time}."}, 403
+            return {
+                "status": "error", 
+                "message": f"Outside working hours. Server Time (IST): {ist_now.strftime('%I:%M %p')}. Check-in allowed only between {start_time} and {end_time}."
+            }, 403
 
         # 2. Process Face Recognition
         image_file = request.files['frame']
@@ -346,7 +352,7 @@ def create_app():
             known_encoding = np.array(json.loads(user.face_encoding))
             if face_recognition.compare_faces([known_encoding], unknown_encoding, tolerance=0.55)[0]:
                 # 3. Prevent duplicate check-ins for today
-                today_str = date.today().strftime('%Y-%m-%d')
+                today_str = ist_now.strftime('%Y-%m-%d')
                 existing = Attendance.query.filter_by(user_id=user.id, date=today_str).first()
                 if existing:
                     return {"status": "error", "message": f"Attendance already marked for today at {existing.time}."}, 400
@@ -357,8 +363,8 @@ def create_app():
                     user_id=user.id,
                     username=user.username,
                     subject=subject,
-                    date=date.today().strftime('%Y-%m-%d'),
-                    time=datetime.now().strftime('%I:%M %p'),
+                    date=ist_now.strftime('%Y-%m-%d'),
+                    time=ist_now.strftime('%I:%M %p'),
                     match_score='95%',
                     status='Verified',
                     proof_path=filename

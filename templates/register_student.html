@@ -160,6 +160,7 @@
                     <li class="nav-item"><a class="nav-link" href="{% if portal_role == 'teacher' %}{{ url_for('teacher.dashboard') }}{% else %}{{ url_for('admin.admin_dashboard') }}{% endif %}">Dashboard</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.academic_calendar') }}">Calendar</a></li>
                     <li class="nav-item"><a class="nav-link active" href="#">Register</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout_page') }}">Sign Out</a></li>
                     <li class="nav-item"><div class="theme-toggle" onclick="toggleTheme()"><i class="fas fa-moon" id="theme-icon"></i></div></li>
                 </ul>
             </div>
