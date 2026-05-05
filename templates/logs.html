@@ -180,8 +180,8 @@
                     <li class="nav-item"><a class="nav-link active" href="{{ url_for('admin.logs') }}">Logs</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.academic_calendar') }}">Calendar</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.settings') }}">Settings</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout_page') }}">Sign Out</a></li>
                     <li class="nav-item"><div class="theme-toggle" onclick="toggleTheme()"><i class="fas fa-moon" id="theme-icon"></i></div></li>
+                    <li class="nav-item ms-3"><a class="btn btn-danger rounded-pill px-4 fw-bold" href="{{ url_for('auth.logout') }}">Logout</a></li>
                 </ul>
             </div>
         </div>
