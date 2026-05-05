@@ -46,13 +46,17 @@
         }
 
         body {
-            background-color: var(--bg-color);
+            background-color: transparent;
             color: var(--on-surface);
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             transition: all 0.3s ease;
             min-height: 100vh;
             padding-top: 100px;
             overflow-x: hidden;
+        }
+
+        html {
+            background-color: var(--bg-color);
         }
 
         .bg-glow {
@@ -79,9 +83,10 @@
         .brand-logo-container {
             width: 48px; height: 48px;
             background: #000000 !important;
-            border-radius: 12px;
+            border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             padding: 5px;
+            overflow: hidden;
         }
 
         .nav-link {
