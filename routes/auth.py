@@ -42,6 +42,7 @@ def login():
 
 
 @auth_bp.route('/login/admin', methods=['GET', 'POST'])
+@auth_bp.route('/admin-portal', methods=['GET', 'POST'])
 def admin_portal_login():
     """Hidden login for administrators only."""
     if request.method == 'POST':
