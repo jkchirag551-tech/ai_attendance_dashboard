@@ -41,7 +41,7 @@ def login():
     return render_template('login.html', error=None, selected_role='', entered_username='')
 
 
-@auth_bp.route('/admin-portal', methods=['GET', 'POST'])
+@auth_bp.route('/login/admin', methods=['GET', 'POST'])
 def admin_portal_login():
     """Hidden login for administrators only."""
     if request.method == 'POST':
