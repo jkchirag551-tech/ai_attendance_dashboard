@@ -1,14 +1,11 @@
 from functools import wraps
-from flask import redirect, url_for, session, request
+from flask import redirect, url_for, session
 
 
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if 'username' not in session:
-            # Check if this is an admin route or accessed via /admin suffix
-            if request.path.startswith('/admin') or request.path.endswith('/admin'):
-                return redirect(url_for('auth.admin_portal_login'))
             return redirect(url_for('auth.login'))
         return f(*args, **kwargs)
     return decorated_function
@@ -19,8 +16,6 @@ def role_required(role):
         @wraps(f)
         def decorated_function(*args, **kwargs):
             if session.get('role') != role:
-                if role == 'admin' or request.path.startswith('/admin'):
-                    return redirect(url_for('auth.admin_portal_login'))
                 return redirect(url_for('auth.login'))
             return f(*args, **kwargs)
         return decorated_function

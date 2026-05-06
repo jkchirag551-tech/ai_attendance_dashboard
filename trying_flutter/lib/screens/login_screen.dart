@@ -232,24 +232,17 @@ class _LoginCard extends StatelessWidget {
                   Container(
                     width: 64,
                     height: 64,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: Colors.black,
                       shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: onSurface.withValues(alpha: 0.1),
-                          blurRadius: 12,
-                          spreadRadius: 2,
-                        ),
-                      ],
                     ),
                     child: Center(
                       child: Padding(
-                        padding: const EdgeInsets.all(10.0),
+                        padding: const EdgeInsets.all(12.0),
                         child: Image.asset(
                           'assets/images/logo.png',
                           fit: BoxFit.contain,
-                          errorBuilder: (_, __, ___) => const Icon(Icons.blur_on_rounded, color: Colors.white, size: 24),
+                          errorBuilder: (_, __, ___) => const Icon(Icons.blur_on_rounded, color: Colors.white, size: 28),
                         ),
                       ),
                     ),

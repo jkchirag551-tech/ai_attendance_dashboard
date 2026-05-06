@@ -41,7 +41,7 @@ def login():
     return render_template('login.html', error=None, selected_role='', entered_username='')
 
 
-@auth_bp.route('/login/admin', methods=['GET', 'POST'])
+@auth_bp.route('/admin-portal', methods=['GET', 'POST'])
 def admin_portal_login():
     """Hidden login for administrators only."""
     if request.method == 'POST':
@@ -55,7 +55,7 @@ def admin_portal_login():
             session['username'] = user.username
             session['role'] = 'admin'
             session['fullname'] = user.fullname
-            return redirect(url_for('admin.admin_dashboard'))
+            return redirect(url_for('auth.welcome'))
 
         return render_template('login.html', error='Invalid admin credentials.', is_admin_portal=True)
 
