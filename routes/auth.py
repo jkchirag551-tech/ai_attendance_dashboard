@@ -19,6 +19,7 @@ def login():
         role = request.form.get('role', '').strip()
         username = request.form.get('username', '').strip()
         password = request.form.get('password')
+        remember = request.form.get('remember') == 'on'
 
         if not role:
             return render_template('login.html', error='Please select a role.', selected_role='', entered_username=username)
@@ -29,6 +30,7 @@ def login():
             if not user.is_approved:
                 return render_template('login.html', error='Your account is pending approval by an administrator.', selected_role=role, entered_username=username)
             
+            session.permanent = remember
             session['user_id'] = user.id
             session['username'] = user.username
             session['role'] = user.role
@@ -48,10 +50,12 @@ def admin_portal_login():
     if request.method == 'POST':
         username = request.form.get('username', '').strip()
         password = request.form.get('password')
+        remember = request.form.get('remember') == 'on'
 
         user = User.query.filter_by(role='admin', username=username).first()
 
         if user and check_password_hash(user.password, password):
+            session.permanent = remember
             session['user_id'] = user.id
             session['username'] = user.username
             session['role'] = 'admin'
