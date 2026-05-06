@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 import firebase_admin
 from firebase_admin import credentials, messaging
-from flask import Flask, request, jsonify, send_from_directory, render_template
+from flask import Flask, request, jsonify, send_from_directory, render_template, redirect, url_for
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit
 from flask_mail import Mail, Message as MailMessage
@@ -128,10 +128,15 @@ def create_app():
             print("Default admin account created: admin / Admin@123")
 
     app_instance.register_blueprint(auth_bp)
-    app_instance.register_blueprint(admin_bp)
+    app_instance.register_blueprint(admin_bp, url_prefix='/admin')
     app_instance.register_blueprint(teacher_bp)
     app_instance.register_blueprint(student_bp)
     app_instance.register_blueprint(face_bp)
+
+    @app_instance.route('/admin')
+    @app_instance.route('/<path:dummy>/admin')
+    def universal_admin_redirect(dummy=None):
+        return redirect(url_for('auth.admin_portal_login'))
 
     # --- PRO API ROUTES ---
     
