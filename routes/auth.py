@@ -55,7 +55,7 @@ def admin_portal_login():
             session['username'] = user.username
             session['role'] = 'admin'
             session['fullname'] = user.fullname
-            return redirect(url_for('auth.welcome'))
+            return redirect(url_for('admin.admin_dashboard'))
 
         return render_template('login.html', error='Invalid admin credentials.', is_admin_portal=True)
 

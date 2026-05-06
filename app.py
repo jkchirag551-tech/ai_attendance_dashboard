@@ -128,7 +128,7 @@ def create_app():
             print("Default admin account created: admin / Admin@123")
 
     app_instance.register_blueprint(auth_bp)
-    app_instance.register_blueprint(admin_bp)
+    app_instance.register_blueprint(admin_bp, url_prefix='/admin')
     app_instance.register_blueprint(teacher_bp)
     app_instance.register_blueprint(student_bp)
     app_instance.register_blueprint(face_bp)
