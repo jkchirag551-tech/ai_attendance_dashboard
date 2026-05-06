@@ -297,6 +297,23 @@
             0% { opacity: 0; transform: translateX(-20px); }
             100% { opacity: 1; transform: translateX(0); }
         }
+
+        /* Mobile Optimization */
+        @media (max-width: 991px) {
+            .top-bar { padding: 12px 20px; }
+            .display-4 { font-size: 2.5rem; }
+            .glass-panel { padding: 20px; }
+            body { padding-top: 80px; }
+            .navbar-collapse {
+                background: var(--surface-color);
+                padding: 20px;
+                border-radius: 20px;
+                margin-top: 15px;
+                box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            }
+            .nav-link { margin: 5px 0; }
+            .container-fluid { padding-left: 15px !important; padding-right: 15px !important; }
+        }
     </style>
 </head>
 <body data-theme="light">

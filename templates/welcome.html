@@ -235,6 +235,22 @@
             margin-left: 15px;
         }
 
+        /* Mobile Optimization */
+        @media (max-width: 991px) {
+            .top-bar { padding: 12px 20px; }
+            .display-1 { font-size: 3rem; }
+            .glass-panel { padding: 20px; }
+            body { padding-top: 80px; }
+            .navbar-collapse {
+                background: var(--surface-color);
+                padding: 20px;
+                border-radius: 20px;
+                margin-top: 15px;
+                box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            }
+            .nav-link { margin: 5px 0; }
+        }
+
         .stat-line {
             display: inline-block;
             width: 60px;
@@ -275,6 +291,9 @@
                 </div>
                 <span>Mr. Attendance</span>
             </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <i class="fas fa-bars"></i>
+            </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item"><a class="nav-link" href="{{ dashboard_url }}">Dashboard</a></li>
