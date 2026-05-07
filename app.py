@@ -713,7 +713,20 @@ def create_app():
 
     # --- FLUTTER WEB BUNDLE ROUTES ---
     @app_instance.route('/')
-    def serve_dashboard():
+    def index():
+        """Redirects to the authentication portal or user dashboard"""
+        if 'user_id' in session:
+            role = session.get('role')
+            if role == 'admin':
+                return redirect(url_for('admin.admin_dashboard'))
+            elif role == 'teacher':
+                return redirect(url_for('teacher.dashboard'))
+            elif role == 'student':
+                return redirect(url_for('student.student_dashboard'))
+        return redirect(url_for('auth.login'))
+
+    @app_instance.route('/app')
+    def serve_flutter_app():
         """Serves the Flutter Web Dashboard"""
         return render_template('index.html')
 
