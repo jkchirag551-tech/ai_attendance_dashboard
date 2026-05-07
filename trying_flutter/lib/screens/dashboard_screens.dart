@@ -7,6 +7,8 @@ import 'package:share_plus/share_plus.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
+import '../core/app_state.dart';
 
 import 'package:flutter_heatmap_calendar/flutter_heatmap_calendar.dart';
 
@@ -186,11 +188,16 @@ class _AdminDashboardState extends State<AdminDashboard> {
     return DashboardShell(
       title: '',
       subtitle: '',
-      currentRoute: 'dashboard',
+      currentRoute: 'admin',
       username: widget.username,
       accentIcon: Icons.admin_panel_settings_rounded,
       hideHeader: true,
-      hideBottomNav: true,
+      extraMoreItems: [
+        _MoreMenuItem(icon: Icons.calendar_month_rounded, label: 'Monthly Attendance Log', onTap: () { Navigator.pop(context); Navigator.push(context, MaterialPageRoute(builder: (_) => const MonthlyAttendanceScreen())); }),
+        _MoreMenuItem(icon: Icons.tune_rounded, label: 'Anomaly Threshold Settings', onTap: () { Navigator.pop(context); _showThresholdSettings(); }),
+        _MoreMenuItem(icon: Icons.notifications_active_outlined, label: 'Test Push Notification', onTap: () { Navigator.pop(context); _sendTestNotification(); }),
+        _MoreMenuItem(icon: Icons.ios_share_rounded, label: 'Export Audit Report (PDF)', onTap: () { Navigator.pop(context); _exportPdf(); }),
+      ],
       child: Stack(
         children: [
           _isLoading
@@ -211,27 +218,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
                           Text(
                             'Presence Intelligence',
                             style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: onSurface),
-                          ),
-                          const Spacer(),
-                          IconButton(
-                            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MonthlyAttendanceScreen())),
-                            icon: Icon(Icons.calendar_month_rounded, color: onSurface),
-                            tooltip: 'Monthly Log',
-                          ),
-                          IconButton(
-                            onPressed: _showThresholdSettings,
-                            icon: Icon(Icons.tune_rounded, color: onSurface),
-                            tooltip: 'Analysis Threshold',
-                          ),
-                          IconButton(
-                            onPressed: _sendTestNotification,
-                            icon: Icon(Icons.notifications_active_outlined, color: onSurface),
-                            tooltip: 'Test Push Notification',
-                          ),
-                          IconButton(
-                            onPressed: _exportPdf,
-                            icon: Icon(Icons.ios_share_rounded, color: onSurface, size: 22),
-                            tooltip: 'Export Audit',
                           ),
                         ],
                       ),
@@ -413,7 +399,6 @@ class _TeacherDashboardState extends State<TeacherDashboard> {
       username: widget.username,
       accentIcon: Icons.class_rounded,
       hideHeader: true,
-      hideBottomNav: true,
       child: _isLoading
           ? const _ShimmerDashboard()
           : Column(
@@ -428,11 +413,6 @@ class _TeacherDashboardState extends State<TeacherDashboard> {
                     Text(
                       'Faculty Workspace',
                       style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: onSurface),
-                    ),
-                    const Spacer(),
-                    IconButton(
-                      onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const UserListScreen(title: 'Students', filterRole: 'student'))),
-                      icon: Icon(Icons.people_alt_rounded, color: onSurface),
                     ),
                   ],
                 ),
@@ -530,7 +510,6 @@ class _StudentDashboardState extends State<StudentDashboard> {
       username: widget.username,
       accentIcon: Icons.person_rounded,
       hideHeader: true,
-      hideBottomNav: true,
       child: _isLoading
           ? const _ShimmerDashboard()
           : RefreshIndicator(
@@ -548,11 +527,6 @@ class _StudentDashboardState extends State<StudentDashboard> {
                       Text(
                         'Presence Portfolio',
                         style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: onSurface),
-                      ),
-                      const Spacer(),
-                      IconButton(
-                        onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const FaceScanScreen())),
-                        icon: Icon(Icons.camera_alt_rounded, color: onSurface, size: 22),
                       ),
                     ],
                   ),
@@ -868,6 +842,7 @@ class DashboardShell extends StatelessWidget {
     this.action,
     this.hideHeader = false,
     this.hideBottomNav = false,
+    this.extraMoreItems,
   });
 
   final String title;
@@ -879,7 +854,64 @@ class DashboardShell extends StatelessWidget {
   final Widget? action;
   final bool hideHeader;
   final bool hideBottomNav;
+  final List<Widget>? extraMoreItems;
 
+  void _showPostNotice(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => PostNoticeDialog(
+        authorName: username,
+        authorRole: currentRoute,
+        onPost: (content, category, push, email, sms) async {
+          const api = AttendanceApiService();
+          await api.postNotice(content, username, currentRoute, category: category, broadcastPush: push, broadcastEmail: email, broadcastSms: sms);
+        },
+      ),
+    );
+  }
+
+  void _showMoreMenu(BuildContext context) {
+    final theme = Theme.of(context);
+    final onSurface = theme.colorScheme.onSurface;
+    final appState = Provider.of<AppState>(context, listen: false);
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => Container(
+        decoration: BoxDecoration(color: theme.cardColor, borderRadius: const BorderRadius.vertical(top: Radius.circular(28))),
+        padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
+        constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.8),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(width: 36, height: 4, decoration: BoxDecoration(color: onSurface.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(2))),
+              const SizedBox(height: 32),
+              if (extraMoreItems != null) ...[
+                ...extraMoreItems!,
+                Padding(padding: const EdgeInsets.symmetric(vertical: 12), child: Divider(color: theme.dividerColor, height: 1)),
+              ],
+              _MoreMenuItem(icon: Icons.person_outline_rounded, label: 'Account Profile', onTap: () { Navigator.pop(context); Navigator.push(context, MaterialPageRoute(builder: (_) => ProfileScreen(username: username, role: currentRoute))); }),
+              _MoreMenuItem(icon: appState.isDarkMode ? Icons.light_mode_rounded : Icons.dark_mode_rounded, label: appState.isDarkMode ? 'Appearance: Light' : 'Appearance: Midnight', onTap: () { Navigator.pop(context); appState.toggleTheme(); }),
+              _MoreMenuItem(icon: Icons.campaign_outlined, label: 'Official Notices', onTap: () { Navigator.pop(context); Navigator.push(context, MaterialPageRoute(builder: (_) => const NoticeScreen())); }),
+              _MoreMenuItem(icon: Icons.calendar_month_outlined, label: 'Academic Calendar', onTap: () { Navigator.pop(context); Navigator.push(context, MaterialPageRoute(builder: (_) => AcademicCalendarScreen(isAdmin: currentRoute == 'admin'))); }),
+              if (currentRoute == 'admin' || currentRoute == 'teacher') ...[
+                _MoreMenuItem(icon: Icons.people_alt_rounded, label: 'Student Directory', onTap: () { Navigator.pop(context); Navigator.push(context, MaterialPageRoute(builder: (_) => const UserListScreen(title: 'Students', filterRole: 'student'))); }),
+                _MoreMenuItem(icon: Icons.person_add_rounded, label: 'Enroll Student', onTap: () { Navigator.pop(context); Navigator.push(context, MaterialPageRoute(builder: (_) => const AdminRegisterScreen(fixedRole: 'student'))); }),
+              ],
+              if (currentRoute == 'teacher' || currentRoute == 'admin') ...[
+                _MoreMenuItem(icon: Icons.add_comment_outlined, label: 'Broadcast Notice', onTap: () { Navigator.pop(context); _showPostNotice(context); }),
+              ],
+              Padding(padding: const EdgeInsets.symmetric(vertical: 12), child: Divider(color: theme.dividerColor, height: 1)),
+              _MoreMenuItem(icon: Icons.logout_rounded, label: 'Sign Out', danger: true, onTap: () { Navigator.pop(context); Navigator.push(context, MaterialPageRoute(builder: (_) => const SignOutScreen())); }),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -907,6 +939,15 @@ class DashboardShell extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
+                    _BottomNavIcon(
+                      icon: Icons.dashboard_rounded,
+                      label: 'Dashboard',
+                      active: currentRoute == 'dashboard' || currentRoute == 'admin' || currentRoute == 'teacher' || currentRoute == 'student',
+                      color: surface,
+                      onTap: () {
+                        // Logic to return to respective dashboard if not already there
+                      },
+                    ),
                     if (currentRoute == 'student')
                       _BottomNavIcon(
                         icon: Icons.camera_front_rounded,
@@ -914,16 +955,6 @@ class DashboardShell extends StatelessWidget {
                         active: false,
                         color: surface,
                         onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const FaceScanScreen())),
-                      ),
-                    if (currentRoute == 'teacher')
-                      _BottomNavIcon(
-                        icon: Icons.dashboard_rounded,
-                        label: 'Command',
-                        active: currentRoute == 'dashboard',
-                        color: surface,
-                        onTap: () {
-                          // No-op or handle appropriately if needed
-                        },
                       ),
                     if (currentRoute == 'teacher')
                       _BottomNavIcon(
@@ -938,11 +969,11 @@ class DashboardShell extends StatelessWidget {
                         },
                       ),
                     _BottomNavIcon(
-                      icon: Icons.logout_rounded,
-                      label: 'Sign Out',
+                      icon: Icons.more_horiz_rounded,
+                      label: 'More',
                       active: false,
                       color: surface,
-                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SignOutScreen())),
+                      onTap: () => _showMoreMenu(context),
                     ),
                   ],
                 ),
@@ -1424,6 +1455,43 @@ class _NavTile extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _MoreMenuItem extends StatelessWidget {
+  const _MoreMenuItem({required this.icon, required this.label, required this.onTap, this.danger = false});
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  final bool danger;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final onSurface = theme.colorScheme.onSurface;
+    final color = danger ? Colors.redAccent : onSurface;
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(color: onSurface.withValues(alpha: 0.03), borderRadius: BorderRadius.circular(16)),
+        margin: const EdgeInsets.only(bottom: 8),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
+              child: Icon(icon, color: color, size: 20),
+            ),
+            const SizedBox(width: 16),
+            Text(label, style: TextStyle(fontWeight: FontWeight.w600, color: color.withValues(alpha: 0.9))),
+            const Spacer(),
+            Icon(Icons.chevron_right_rounded, color: onSurface.withValues(alpha: 0.2), size: 18),
+          ],
         ),
       ),
     );
