@@ -710,8 +710,8 @@ def create_app():
     # --- FLUTTER WEB BUNDLE ROUTES ---
     @app_instance.route('/')
     def serve_dashboard():
-        """Serves the Flutter Web Dashboard"""
-        return render_template('index.html')
+        """Redirects to the Flask Login Page (Landing Page)"""
+        return redirect(url_for('auth.login'))
 
     @app_instance.route('/<path:path>')
     def serve_flutter_assets(path):
