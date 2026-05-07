@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy import or_, func
 from models import db, User
 import base64
 import json
@@ -24,9 +25,22 @@ def login():
         if not role:
             return render_template('login.html', error='Please select a role.', selected_role='', entered_username=username)
 
-        user = User.query.filter_by(role=role, username=username).first()
+        # Allow login with either username or Registration Number (userid)
+        # Case-insensitive search
+        user = User.query.filter(
+            or_(
+                func.lower(User.username) == func.lower(username),
+                func.lower(User.userid) == func.lower(username)
+            )
+        ).first()
 
         if user and check_password_hash(user.password, password):
+            # Strict role verification
+            if user.role != role:
+                return render_template('login.html', 
+                    error=f'Access Denied: This account is registered as {user.role.capitalize()}, not {role.capitalize()}.', 
+                    selected_role=role, entered_username=username)
+
             if not user.is_approved:
                 return render_template('login.html', error='Your account is pending approval by an administrator.', selected_role=role, entered_username=username)
             
@@ -52,7 +66,11 @@ def admin_portal_login():
         password = request.form.get('password')
         remember = request.form.get('remember') == 'on'
 
-        user = User.query.filter_by(role='admin', username=username).first()
+        # Case-insensitive admin login
+        user = User.query.filter(
+            User.role == 'admin',
+            func.lower(User.username) == func.lower(username)
+        ).first()
 
         if user and check_password_hash(user.password, password):
             session.permanent = remember

@@ -14,7 +14,7 @@ from flask import Flask, request, jsonify, send_from_directory, render_template,
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit
 from flask_mail import Mail, Message as MailMessage
-from sqlalchemy import text
+from sqlalchemy import text, or_, func
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from config import Config
@@ -280,11 +280,18 @@ def create_app():
     @app_instance.route('/api/login', methods=['POST'])
     def api_login():
         data = request.get_json() or {}
-        username = data.get('username')
+        username = data.get('username', '').strip()
         password = data.get('password')
         requested_role = data.get('role')
 
-        user = User.query.filter_by(username=username).first()
+        # Allow login with either username or Registration Number (userid)
+        # Case-insensitive search
+        user = User.query.filter(
+            or_(
+                func.lower(User.username) == func.lower(username),
+                func.lower(User.userid) == func.lower(username)
+            )
+        ).first()
         
         if user and check_password_hash(user.password, password):
             if not user.is_approved:
