@@ -134,8 +134,6 @@ def create_app():
     app_instance.register_blueprint(face_bp)
 
     @app_instance.route('/admin')
-    @app_instance.route('/admin/')
-    @app_instance.route('/admin/<path:dummy>')
     @app_instance.route('/<path:dummy>/admin')
     def universal_admin_redirect(dummy=None):
         if session.get('role') == 'admin':
