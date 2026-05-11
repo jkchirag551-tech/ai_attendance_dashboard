@@ -67,6 +67,33 @@ def ensure_schema(app):
         connection.commit()
         connection.close()
 
+def ensure_demo_user(role, fullname, login_id, password, fallback_userid):
+    user = User.query.filter_by(role=role, username=login_id).first()
+    if not user:
+        user = User.query.filter_by(role=role, userid=login_id).first()
+    if not user:
+        user = User.query.filter_by(role=role).order_by(User.id.asc()).first()
+
+    if not user:
+        user = User(
+            role=role,
+            fullname=fullname,
+            userid=fallback_userid,
+            username=login_id,
+            password=generate_password_hash(password)
+        )
+        db.session.add(user)
+
+    user.fullname = user.fullname or fullname
+    user.username = login_id
+    user.userid = login_id
+    user.email = login_id
+    user.password = generate_password_hash(password)
+    if hasattr(user, 'is_approved'):
+        user.is_approved = True
+
+    return user
+
 def create_app():
     app_instance = Flask(__name__, template_folder='templates', static_folder='static')
     app_instance.config.from_object(Config)
@@ -113,19 +140,30 @@ def create_app():
     with app_instance.app_context():
         db.create_all()
         ensure_schema(app_instance)
-        
-        # Create default admin if none exists
-        if User.query.filter_by(role='admin').count() == 0:
-            default_admin = User(
-                role='admin',
-                fullname='System Administrator',
-                userid='ADMIN001',
-                username='admin',
-                password=generate_password_hash('Admin@123')
-            )
-            db.session.add(default_admin)
-            db.session.commit()
-            print("Default admin account created: admin / Admin@123")
+
+        ensure_demo_user(
+            role='admin',
+            fullname='System Administrator',
+            login_id='admin@gmail.com',
+            password='admin@123',
+            fallback_userid='admin@gmail.com'
+        )
+        ensure_demo_user(
+            role='teacher',
+            fullname='Demo Teacher',
+            login_id='teacherdemo@gmail.com',
+            password='demo@123',
+            fallback_userid='teacherdemo@gmail.com'
+        )
+        ensure_demo_user(
+            role='student',
+            fullname='Demo Student',
+            login_id='studentdemo@gmail.com',
+            password='demo@123',
+            fallback_userid='studentdemo@gmail.com'
+        )
+        db.session.commit()
+        print("Demo accounts ensured for admin, teacher, and student.")
 
     app_instance.register_blueprint(auth_bp)
     app_instance.register_blueprint(admin_bp, url_prefix='/admin')
